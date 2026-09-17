@@ -1,0 +1,18 @@
+Prompt: Using the attached file structure, can you show an example of how to reveal
+an API endpoint using the spring boot set-up
+Produced: 
+"@RestController
+@RequestMapping("/api/practice")
+public class ApiController {" And general information about how spring boot works with
+API endpoints
+Changed: Adapted to fit our actual calls going forward and used as the general structure for
+the "ApiController.java" file.
+
+Promt: Using the attached file repo, how would I make a javascript method that would change which questions are being shown depending on the category is selected by the user in the html file
+Produced: Included the needed const from the html file along with the general structure of
+"if (categorySelect.value !== "") {
+        url = url + "?category=" + categorySelect.value;
+    }
+" 
+So that the categorySelect value is changed when the dropdown from the html is used. Also included the need for a event listener to see the change. 
+Changed: Adapted for our specific categories used and used the related form as a helpful guide for the other needed javascript methods. 
