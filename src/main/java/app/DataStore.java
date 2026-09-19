@@ -79,6 +79,15 @@ public class DataStore {
                     "Practice request not found."
             );
         }
+        if (requestToAccept.getRequesterUserId() == userId) {
+            throw new IllegalArgumentException("You cannot accept your own practice request.");
+        }
+        if (!requestToAccept.getStatus().equals("OPEN")) {
+            throw new IllegalStateException(
+                    "Practice request is no longer available."
+            );
+        }
+
         requestToAccept.accept();
         Pairing pairing = new Pairing(
                 nextPairingId,
