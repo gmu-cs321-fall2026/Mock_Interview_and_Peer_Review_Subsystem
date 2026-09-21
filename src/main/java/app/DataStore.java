@@ -58,6 +58,7 @@ public class DataStore {
     public List<PracticeRequest> getOpenRequests() {
         List<PracticeRequest> openRequests = new ArrayList<>();
         for (PracticeRequest request : requests) {
+            // if the req is open will get added to the list once the status becomes accepted won't be added
             if (request.getStatus().equals("OPEN")) {
                 openRequests.add(request);
             }
@@ -69,11 +70,11 @@ public class DataStore {
     public Pairing acceptRequest(int requestId, int userId) {
         PracticeRequest requestToAccept = null;
         for (PracticeRequest request : requests) {
-            if (request.getId() == requestId) {
-                requestToAccept = request;
+            if (request.getId() == requestId) {// found it
+                requestToAccept = request;// accepted it
                 break;
             }
-        }
+        }// if you did not find the request
         if (requestToAccept == null) {
             throw new IllegalArgumentException(
                     "Practice request not found."
@@ -81,14 +82,15 @@ public class DataStore {
         }
         if (requestToAccept.getRequesterUserId() == userId) {
             throw new IllegalArgumentException("You cannot accept your own practice request.");
-        }
+        }// if the request was not open
         if (!requestToAccept.getStatus().equals("OPEN")) {
             throw new IllegalStateException(
                     "Practice request is no longer available."
             );
         }
-
+        // otherwise accept it
         requestToAccept.accept();
+        // pairing happens here
         Pairing pairing = new Pairing(
                 nextPairingId,
                 requestToAccept.getId(),
@@ -96,7 +98,7 @@ public class DataStore {
                 userId
         );
         nextPairingId++;
-        pairings.add(pairing);
+        pairings.add(pairing);// add pairing to the list at the top
         return pairing;
     }
 }
