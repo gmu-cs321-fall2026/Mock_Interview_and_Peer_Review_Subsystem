@@ -45,7 +45,7 @@ public class DataStore {
         return matchingQuestions;
     }
 
-
+   
     public PracticeRequest createRequest(int userId) {
         PracticeRequest request =
                 new PracticeRequest(nextRequestId, userId);
@@ -97,8 +97,27 @@ public class DataStore {
                 requestToAccept.getRequesterUserId(),
                 userId
         );
+        
+
+
+
+
+
+
         nextPairingId++;
         pairings.add(pairing);// add pairing to the list at the top
         return pairing;
     }
+    public List<Pairing> getPairingsForUser(int userId) {
+
+            List<Pairing> userPairings = new ArrayList<>();
+
+            for (Pairing pairing : pairings) {
+                if (pairing.getRequesterUserId() == userId ||pairing.getPartnerUserId() == userId) {
+                    userPairings.add(pairing);
+                }
+            }
+
+        return userPairings;
+        }
 }
