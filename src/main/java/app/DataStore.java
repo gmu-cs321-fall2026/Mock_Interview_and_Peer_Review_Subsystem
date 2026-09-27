@@ -17,19 +17,83 @@ public class DataStore {
 
 
     public DataStore() {
-        questions.add(new Question(
-                1, "Tell me about yourself.", "BEHAVIORAL"
-        ));
-        questions.add(new Question(
-                2,"What is the difference between a stack and a queue?","TECHNICAL"
-        ));
-        questions.add(new Question(
-                3,"Estimate how many cups of coffee are sold on campus each day.","CASE"
-        ));
-        questions.add(new Question(
-                4,"Why are you interested in this industry?","INDUSTRY"
-        ));
-    }
+            questions.add(new Question(
+                    1, "Tell me about yourself.", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    2, "Tell me about a time you faced a difficult challenge.", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    3, "Describe a time when you worked successfully as part of a team.", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    4, "Tell me about a time you made a mistake and what you learned from it.", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    5, "Describe a situation where you had to meet a tight deadline.", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    6, "Tell me about a time you disagreed with a teammate.", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    7, "Describe a project you are particularly proud of.", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    8, "How do you prioritize tasks when you have multiple deadlines?", "BEHAVIORAL"
+            ));
+            questions.add(new Question(
+                    9, "What is the difference between a stack and a queue?", "TECHNICAL"
+            ));
+            questions.add(new Question(
+                    10, "What is the difference between an array and a linked list?", "TECHNICAL"
+            ));
+            questions.add(new Question(
+                    11, "What is the purpose of an API?", "TECHNICAL"
+            ));
+            questions.add(new Question(
+                    12, "What is the difference between authentication and authorization?", "TECHNICAL"
+            ));
+            questions.add(new Question(
+                    13, "What is a database primary key?", "TECHNICAL"
+            ));
+            questions.add(new Question(
+                    14, "What is the purpose of version control systems such as Git?", "TECHNICAL"
+            ));
+            questions.add(new Question(
+                    15, "What is the difference between HTTP GET and POST requests?", "TECHNICAL"
+            ));
+            questions.add(new Question(
+                    16, "Estimate how many cups of coffee are sold on campus each day.", "CASE"
+            ));
+            questions.add(new Question(
+                    17, "How would you estimate the number of students who attend a career fair?", "CASE"
+            ));
+            questions.add(new Question(
+                    18, "A company has seen a 20% decrease in job applications. How would you investigate why?", "CASE"
+            ));
+            questions.add(new Question(
+                    19, "How would you design a system to help students find available mock interview partners?", "CASE"
+            ));
+            questions.add(new Question(
+                    20, "A website becomes significantly slower after a new feature is released. How would you troubleshoot the problem?", "CASE"
+            ));
+            questions.add(new Question(
+                    21, "How would you improve the process for matching students with mentors?", "CASE"
+            ));
+            questions.add(new Question(
+                    22, "Why are you interested in the technology industry?", "INDUSTRY"
+            ));
+            questions.add(new Question(
+                    23, "What technology trend do you think will have the biggest impact on software development?", "INDUSTRY"
+            ));
+            questions.add(new Question(
+                    24, "What skills do you think are most important for a successful software engineer?", "INDUSTRY"
+            ));
+            questions.add(new Question(
+                    25, "How do you stay informed about changes and developments in the technology industry?", "INDUSTRY"
+            ));
+        }
+
 
 
     public List<Question> getQuestions(String category) {
