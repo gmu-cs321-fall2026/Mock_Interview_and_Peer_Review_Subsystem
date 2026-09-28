@@ -110,8 +110,16 @@ function showMessage(text) {
     message.textContent = text;
 }
 
-categorySelect.addEventListener("change", loadQuestions);
-createRequestButton.addEventListener("click", createRequest);
-userIdInput.addEventListener("change", loadRequests);
-loadQuestions();
-loadRequests();
+if (categorySelect) {
+    categorySelect.addEventListener("change", loadQuestions);
+    loadQuestions();
+}
+
+if (createRequestButton) {
+    createRequestButton.addEventListener("click", createRequest);
+}
+
+if (userIdInput) {
+    userIdInput.addEventListener("change", loadRequests);
+    loadRequests();
+}
