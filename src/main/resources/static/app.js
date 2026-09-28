@@ -148,29 +148,10 @@ async function loadPairings() {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function showMessage(text) {
     message.textContent = text;
 }
 
-<<<<<<< HEAD
 if (categorySelect) {
     categorySelect.addEventListener("change", loadQuestions);
     loadQuestions();
@@ -181,14 +162,11 @@ if (createRequestButton) {
 }
 
 if (userIdInput) {
-    userIdInput.addEventListener("change", loadRequests);
+    userIdInput.addEventListener("change", function() {
+        loadRequests();
+        loadPairings();
+    });
+
     loadRequests();
+    loadPairings();
 }
-=======
-categorySelect.addEventListener("change", loadQuestions);
-createRequestButton.addEventListener("click", createRequest);
-userIdInput.addEventListener("change", function(){ loadRequests(); loadPairings();});
-loadQuestions();
-loadRequests();
-loadPairings();
->>>>>>> main
