@@ -50,4 +50,10 @@ public class ApiController {
         Map<String, String> errorMessage = Map.of("error", exception.getMessage());
         return errorMessage;
     }
+    @GetMapping("/pairings")
+    public List<Pairing> getMyPairings( 
+            @RequestHeader("X-User-Id") int userId){
+
+                return store.getPairingsForUser(userId);
+            }
 }
