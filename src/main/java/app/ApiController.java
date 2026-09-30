@@ -56,4 +56,8 @@ public class ApiController {
 
                 return store.getPairingsForUser(userId);
             }
+    @GetMapping("/admin/pairings")
+    public List<Pairing> getAllPairings(){
+       return store.getAllPairings();
+    }
 }

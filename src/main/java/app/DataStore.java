@@ -184,4 +184,9 @@ public class DataStore {
 
         return userPairings;
         }
+        // retrieving all pairings
+    // give me everythig in pairing objects
+    public List<Pairing> getAllPairings(){
+             return pairings;
+    }
 }
