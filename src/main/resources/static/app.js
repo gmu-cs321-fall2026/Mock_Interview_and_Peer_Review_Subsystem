@@ -1,10 +1,16 @@
-const userIdInput = document.getElementById("userId");
 const categorySelect = document.getElementById("category");
 const questionsDiv = document.getElementById("questions");
 const requestsDiv = document.getElementById("requests");
 const message = document.getElementById("message");
 const createRequestButton = document.getElementById("createRequest");
 const pairingsDiv = document.getElementById("pairings");
+const userSwitcher = document.getElementById("userSwitcher");
+const currentUserText = document.getElementById("currentUser");
+let currentUserId = Number(localStorage.getItem("currentUserId"));
+
+if (!currentUserId) {
+    currentUserId = 101;
+}
 
 
 async function loadQuestions() {
@@ -44,7 +50,7 @@ async function loadRequests() {
     for (let i = 0; i < requests.length; i++) {
         const request = requests[i];
         const ownRequest =
-            Number(userIdInput.value) === request.requesterUserId;
+            currentUserId === request.requesterUserId;
 
         let requestCard = "<div class='card'>" + "Student " + request.requesterUserId;
 
@@ -65,7 +71,7 @@ async function createRequest() {
             {
                 method: "POST",
                 headers: {
-                    "X-User-Id": userIdInput.value
+                    "X-User-Id": currentUserId
                 }
             }
         );
@@ -90,7 +96,7 @@ async function acceptRequest(requestId) {
             {
                 method: "POST",
                 headers: {
-                    "X-User-Id": userIdInput.value
+                    "X-User-Id": currentUserId
                 }
             }
         );
@@ -115,7 +121,7 @@ async function loadPairings() {
         "/api/practice/pairings",
         {
             headers: {
-                "X-User-Id": userIdInput.value
+                "X-User-Id": currentUserId
             }
         }
     );
@@ -134,7 +140,7 @@ async function loadPairings() {
         const pairing = pairings[i];
 
         const otherUserId =
-            Number(userIdInput.value) === pairing.requesterUserId
+            currentUserId === pairing.requesterUserId
                 ? pairing.partnerUserId
                 : pairing.requesterUserId;
 
@@ -161,12 +167,69 @@ if (createRequestButton) {
     createRequestButton.addEventListener("click", createRequest);
 }
 
-if (userIdInput) {
-    userIdInput.addEventListener("change", function() {
-        loadRequests();
-        loadPairings();
-    });
+if (userSwitcher) {
+    loadUsers();
+}
 
+if (requestsDiv) {
     loadRequests();
+}
+
+if (pairingsDiv) {
     loadPairings();
+}
+async function loadUsers() {
+
+    const response =
+        await fetch("/api/practice/users");
+
+    const users =
+        await response.json();
+
+    userSwitcher.innerHTML = "";
+
+    for (let i = 0; i < users.length; i++) {
+
+        const user = users[i];
+
+        const button =
+            document.createElement("button");
+
+        button.textContent =
+            user.name;
+
+        if (user.id === currentUserId) {
+            button.classList.add("selected-user");
+
+            currentUserText.textContent =
+                "Current User: " +
+                user.name +
+                " (" +
+                user.role +
+                ")";
+        }
+
+        button.addEventListener(
+            "click",
+            function() {
+                selectUser(user.id);
+            }
+        );
+
+        userSwitcher.appendChild(button);
+    }
+}
+function selectUser(userId) {
+    currentUserId = userId;
+    localStorage.setItem(
+        "currentUserId",
+        userId
+    );
+    loadUsers();
+    if (requestsDiv) {
+        loadRequests();
+    }
+    if (pairingsDiv) {
+        loadPairings();
+    }
 }

@@ -1,6 +1,7 @@
 package app;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
 
@@ -54,10 +55,27 @@ public class ApiController {
     public List<Pairing> getMyPairings( 
             @RequestHeader("X-User-Id") int userId){
 
+                User user = store.getUser(userId);
+                if(!user.isAdmin()){
+                    
+                }
                 return store.getPairingsForUser(userId);
             }
     @GetMapping("/admin/pairings")
-    public List<Pairing> getAllPairings(){
-       return store.getAllPairings();
+    public List<Pairing> getAllPairings(
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        User user = store.getUser(userId);
+        if (!user.isAdmin()) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Admin access required."
+            );
+        }
+        return store.getAllPairings();
+    }
+    @GetMapping("/users")
+    public List<User> getUsers() {
+        return store.getUsers();
     }
 }

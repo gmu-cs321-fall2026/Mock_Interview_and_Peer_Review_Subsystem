@@ -46,3 +46,10 @@ userIdInput.addEventListener("change", function () {
 changed: Adjusted the line of code per the instructions and ran it. The issue was resolved. I tested multiple variations of users requesting and accepting, and each user properly showed the correct pairing list immedietely when switched to.
 
 
+10/5/2026
+
+Prompt: Asked ChatGPT "Using the attached file repo, please identify, as a first pass, any sections that would need to be updated when a "User" class is added that will house the userID needed for the pairing system. This should include in current classes, the ApiController, and the javascript."
+
+produced: Identified sections in DataStore and ApiController that needed updates. Also provided suggested code to use to replace the old static UserID.
+
+changed: Used as a first pass but after additional looking, changes were also required in the entire static folder. 

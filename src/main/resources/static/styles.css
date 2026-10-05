@@ -57,3 +57,20 @@ input {
         margin-bottom: 10px;
     }
 }
+
+.user-area {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.user-switcher {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.user-switcher .selected-user {
+    font-weight: bold;
+    border: 2px solid #333;
+}

@@ -11,12 +11,18 @@ public class DataStore {
     private List<Question> questions = new ArrayList<>();
     private List<PracticeRequest> requests = new ArrayList<>();
     private List<Pairing> pairings = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     private int nextRequestId = 1;
     private int nextPairingId = 1;
 
 
     public DataStore() {
+
+            users.add(new User(101, "Student 1", "STUDENT"));
+            users.add(new User(102, "Student 2", "STUDENT"));
+            users.add(new User(103, "Student 3", "STUDENT"));
+            users.add(new User(104, "Admin", "ADMIN"));
             questions.add(new Question(
                     1, "Tell me about yourself.", "BEHAVIORAL"
             ));
@@ -189,4 +195,18 @@ public class DataStore {
     public List<Pairing> getAllPairings(){
              return pairings;
     }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public User getUser(int userId) {
+        for (User user : users) {
+            if (user.getID() == userId) {
+                return user;
+            }
+        }
+        throw new IllegalArgumentException("User not found.");
+    }
+
 }
