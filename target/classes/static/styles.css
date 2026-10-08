@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+header,
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+section {
+    margin-top: 35px;
+}
+.card {
+    border: 1px solid #ccc;
+    padding: 12px;
+    margin-top: 10px;
+}
+button,
+select,
+input {
+    padding: 7px;
+}
+#message {
+    font-weight: bold;
+}
