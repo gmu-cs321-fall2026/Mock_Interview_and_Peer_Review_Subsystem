@@ -15,4 +15,34 @@ Produced: Included the needed const from the html file along with the general st
     }
 " 
 So that the categorySelect value is changed when the dropdown from the html is used. Also included the need for a event listener to see the change. 
-Changed: Adapted for our specific categories used and used the related form as a helpful guide for the other needed javascript methods. 
+Changed: Adapted for our specific categories used and used the related form as a helpful guide for the other needed javascript methods.
+
+
+
+
+9/26/26
+Prompt: Asked ChatGPT, (Included all files for current project build) Using this code, Generate a function that stores the practice requests a user accepts on the website into a list that is only visible to the users involved in the request. Specifically the requester and requestee
+
+Produced: It added a new function for storing pairs for requests and adding them to a new list. Then it added an api endpoint that will make the site only show the specific requests that involve the current user. Then it produced code to show these changes on the website. Finally it added suggestions for how to display these changes on the site as well as how to make a user unable to accept their own requests.(This last part was already changed by another team member, just not in the build I pushed to GPT)
+
+Changed: Implemented code into file and adjusted the formatting so it fit correctly, omitted last part as I did not understand what it was doing at the time. Attempted to make my own version of the change.
+
+Prompt: Generate a test file for this function to test locally without needing to push to website.
+
+Produced: It created a test file that ran the pairing function and request functions. The test checked the outputs and asserted that only specific users. 
+
+Changed: I did not change anything, I copy pasted the code into a new java file and looked it over before running locally.
+
+Prompt: currently the website does not change the list of pairings when selecting a new user until the new currently selected user accepts a request. How can I make it change the displayed list when switching user id's via the menu?
+
+produced: It produced the same line of code I had omitted in the first prompt and explained what it did.
+"Your pairing list is probably only being refreshed inside the “accept request” flow, so when you switch the selected user, the UI still shows the previous user’s pairings until something else triggers loadPairings().
+The fix is to also call loadPairings() whenever the user ID changes."
+userIdInput.addEventListener("change", function () {
+    loadRequests();
+    loadPairings();
+});
+
+changed: Adjusted the line of code per the instructions and ran it. The issue was resolved. I tested multiple variations of users requesting and accepting, and each user properly showed the correct pairing list immedietely when switched to.
+
+

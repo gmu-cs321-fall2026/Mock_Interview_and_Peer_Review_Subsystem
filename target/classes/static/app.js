@@ -4,6 +4,10 @@ const questionsDiv = document.getElementById("questions");
 const requestsDiv = document.getElementById("requests");
 const message = document.getElementById("message");
 const createRequestButton = document.getElementById("createRequest");
+<<<<<<< HEAD
+=======
+const pairingsDiv = document.getElementById("pairings");
+>>>>>>> 2d2b7671db7ab043705f0d2b448491dbecd1a02e
 
 
 async function loadQuestions() {
@@ -104,14 +108,85 @@ async function acceptRequest(requestId) {
     const successMessage = "Student " + data.requesterUserId + " paired with Student " + data.partnerUserId + ".";
     showMessage(successMessage);
     loadRequests();
+<<<<<<< HEAD
 }
 
+=======
+    loadPairings();
+}
+
+
+
+async function loadPairings() {
+    const response = await fetch(
+        "/api/practice/pairings",
+        {
+            headers: {
+                "X-User-Id": userIdInput.value
+            }
+        }
+    );
+
+    const pairings = await response.json();
+
+    pairingsDiv.innerHTML = "";
+
+    if (pairings.length === 0) {
+        pairingsDiv.innerHTML =
+            "<p>You do not have any accepted practice requests.</p>";
+        return;
+    }
+
+    for (let i = 0; i < pairings.length; i++) {
+        const pairing = pairings[i];
+
+        const otherUserId =
+            Number(userIdInput.value) === pairing.requesterUserId
+                ? pairing.partnerUserId
+                : pairing.requesterUserId;
+
+        const pairingCard =
+            "<div class='card'>" +
+                "<strong>Practice Partner:</strong> Student " +
+                otherUserId +
+            "</div>";
+
+        pairingsDiv.innerHTML += pairingCard;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> 2d2b7671db7ab043705f0d2b448491dbecd1a02e
 function showMessage(text) {
     message.textContent = text;
 }
 
 categorySelect.addEventListener("change", loadQuestions);
 createRequestButton.addEventListener("click", createRequest);
+<<<<<<< HEAD
 userIdInput.addEventListener("change", loadRequests);
 loadQuestions();
 loadRequests();
+=======
+userIdInput.addEventListener("change", function(){ loadRequests(); loadPairings();});
+loadQuestions();
+loadRequests();
+loadPairings();
+>>>>>>> 2d2b7671db7ab043705f0d2b448491dbecd1a02e
