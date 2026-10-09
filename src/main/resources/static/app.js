@@ -4,6 +4,7 @@ const requestsDiv = document.getElementById("requests");
 const message = document.getElementById("message");
 const createRequestButton = document.getElementById("createRequest");
 const pairingsDiv = document.getElementById("pairings");
+const pairingFilter = document.getElementById("pairingFilter");
 const userSwitcher = document.getElementById("userSwitcher");
 const currentUserText = document.getElementById("currentUser");
 let currentUserId = Number(localStorage.getItem("currentUserId"));
@@ -115,7 +116,7 @@ async function acceptRequest(requestId) {
 }
 
 
-
+//This function loads pairings for the user. ||PRODUCED BY CHATGPT||
 async function loadPairings() {
     const response = await fetch(
         "/api/practice/pairings",
@@ -128,16 +129,26 @@ async function loadPairings() {
 
     const pairings = await response.json();
 
-    pairingsDiv.innerHTML = "";
+    let filteredPairings = pairings;
+    //Filters the list for requests user has accepted or accepted requests user has made. ||PRODUCED BY CHATGPT||
+    if(pairingFilter){
+        if(pairingFilter.value==="created"){
+            filteredPairings=pairings.filter(pairing=>pairing.requesterUserId===currentUserId);
+        }else if(pairingFilter.value === "accepted"){
+            filteredPairings=pairings.filter(pairing=>pairing.partnerUserId===currentUserId);
+        }
+    }
 
-    if (pairings.length === 0) {
+    pairingsDiv.innerHTML = "";
+    
+    if (filteredPairings.length === 0) {
         pairingsDiv.innerHTML =
-            "<p>You do not have any accepted practice requests.</p>";
+            "<p>No results found.</p>";
         return;
     }
 
-    for (let i = 0; i < pairings.length; i++) {
-        const pairing = pairings[i];
+    for (let i = 0; i < filteredPairings.length; i++) {
+        const pairing = filteredPairings[i];
 
         const otherUserId =
             currentUserId === pairing.requesterUserId
@@ -165,6 +176,9 @@ if (categorySelect) {
 
 if (createRequestButton) {
     createRequestButton.addEventListener("click", createRequest);
+}
+if (pairingFilter) {
+    pairingFilter.addEventListener("change", loadPairings);
 }
 
 if (userSwitcher) {

@@ -53,3 +53,12 @@ Prompt: Asked ChatGPT "Using the attached file repo, please identify, as a first
 produced: Identified sections in DataStore and ApiController that needed updates. Also provided suggested code to use to replace the old static UserID.
 
 changed: Used as a first pass but after additional looking, changes were also required in the entire static folder. 
+
+
+10/9/2026
+
+Prompt:Asked ChatGPT: I want to add the ability for a user to filter the list of pairings they see on the website. This filter should be able to show only either the requests the user has made or the requests the user has accepted. Could you show me the best way to implement this in the current environment?
+
+Produced: It took the current code and showed the easiest method to add a filter to the pairings list. It suggested additions to requests.html and app.js..
+
+changed: Since these were only frontend changes, I added the code as given by ChatGPT. I edited the message it came up with for an empty filter and I manually typed in the code it gave so that it would fit nicely in the current build. I added comments explaining what the code did and marked them as almost entirely made by AI.
