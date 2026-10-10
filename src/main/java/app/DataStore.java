@@ -8,21 +8,22 @@ import java.util.List;
 @Component
 public class DataStore {
 
-    private List<Question> questions = new ArrayList<>();
-    private List<PracticeRequest> requests = new ArrayList<>();
-    private List<Pairing> pairings = new ArrayList<>();
-    private List<User> users = new ArrayList<>();
+    private List<Question> questions = new ArrayList<>(); //List of all the question
+    private List<PracticeRequest> requests = new ArrayList<>(); //List of requests sent by users
+    private List<Pairing> pairings = new ArrayList<>(); //Stores accpected user interview requests
+    private List<User> users = new ArrayList<>(); //List of all users, be it student or admin
 
-    private int nextRequestId = 1;
-    private int nextPairingId = 1;
+    private int nextRequestId = 1; //Id to assign practice request
+    private int nextPairingId = 1;//Used to track id for next request pair
 
 
     public DataStore() {
-
+                //Sample data of users and admin for testing purpose
             users.add(new User(101, "Student 1", "STUDENT"));
             users.add(new User(102, "Student 2", "STUDENT"));
             users.add(new User(103, "Student 3", "STUDENT"));
             users.add(new User(104, "Admin", "ADMIN"));
+            //25 diffrent questions that are divided into diffrent catogories like behavioral, technical, case and industry
             questions.add(new Question(
                     1, "Tell me about yourself.", "BEHAVIORAL"
             ));
@@ -101,21 +102,20 @@ public class DataStore {
         }
 
 
-
+        //Getter method used to get specific catogory, or return all questions if not specified
     public List<Question> getQuestions(String category) {
-        if (category == null || category.isBlank()) {
+        if (category == null || category.isBlank()) {//Checks if requestinf catogory is empty, which case it returns all questions
             return questions;
         }
-        List<Question> matchingQuestions = new ArrayList<>();
-        for (Question question : questions) {
+        List<Question> matchingQuestions = new ArrayList<>(); //Creates indivdual array list for all questions in category
+        for (Question question : questions) {//goes through array list of all questions and checks if it is the correct category
             if (question.getCategory().equalsIgnoreCase(category)) {
                 matchingQuestions.add(question);
             }
-        }
+        }//returns list of all the matching questions
         return matchingQuestions;
     }
 
-   
     public PracticeRequest createRequest(int userId) {
         PracticeRequest request =
                 new PracticeRequest(nextRequestId, userId);
