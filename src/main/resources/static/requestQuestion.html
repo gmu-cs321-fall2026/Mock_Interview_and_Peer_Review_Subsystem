@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suggest Interview Question</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Mock Interview Practice</h1>
+    <div class="user-area">
+        <div id="userSwitcher" class="user-switcher"></div>
+        <small id="currentUser"></small>
+    </div>
+    <a href="index.html">Questions</a>
+</header>
+
+<main>
+    <section>
+        <h2>Suggest a New Interview Question</h2>
+        <div class="card">
+            <label for="questionText">Question Text:</label><br>
+            <textarea id="questionText" rows="3" style="width: 100%; margin-top: 5px; box-sizing: border-box;" placeholder="Enter question..."></textarea>
+            <br><br>
+            <label for="questionCategory">Category:</label><br>
+            <select id="questionCategory" style="margin-top: 5px;">
+                <option value="BEHAVIORAL">Behavioral</option>
+                <option value="TECHNICAL">Technical</option>
+                <option value="CASE">Case</option>
+                <option value="INDUSTRY">Industry</option>
+            </select>
+            <br><br>
+            <button id="submitQuestion">Submit Question</button>
+        </div>
+    </section>
+
+    <section id="adminOnly" style="display: none;">
+        <h2>Requested Questions (Admin Only)</h2>
+        <div id="questionRequests"></div>
+    </section>
+</main>
+
+<p id="message"></p>
+
+<script src="app.js"></script>
+
+</body>
+</html>
