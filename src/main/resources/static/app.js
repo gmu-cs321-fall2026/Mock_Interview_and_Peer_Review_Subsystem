@@ -164,6 +164,27 @@ async function loadPairings() {
         pairingsDiv.innerHTML += pairingCard;
     }
 }
+async function loadAdminPairings() {
+    const response = await fetch(
+        "/api/practice/admin/pairings",
+        {
+            headers: {
+                "X-User-Id": currentUserId
+            }
+        }
+    );
+    const pairings = await response.json();
+    pairingsDiv.innerHTML = "";
+    for (let i = 0; i < pairings.length; i++) {
+        const pairing = pairings[i];
+        const pairingCard =
+            "<div class='card'>" +
+            "Student " + pairing.requesterUserId +
+            " paired with Student " + pairing.partnerUserId +
+            "</div>";
+        pairingsDiv.innerHTML += pairingCard;
+    }
+}
 
 function showMessage(text) {
     message.textContent = text;
@@ -190,7 +211,7 @@ if (requestsDiv) {
 }
 
 if (pairingsDiv) {
-    loadPairings();
+    loadPairingsForCurrentUser();
 }
 async function loadUsers() {
 
@@ -233,6 +254,16 @@ async function loadUsers() {
         userSwitcher.appendChild(button);
     }
 }
+async function loadPairingsForCurrentUser() {
+    const response = await fetch("/api/practice/users");
+    const users = await response.json();
+    const currentUser = users.find(user => user.id === currentUserId);
+    if (currentUser && currentUser.role === "ADMIN") {
+        loadAdminPairings();
+    }else{
+        loadPairings();
+    }
+}
 function selectUser(userId) {
     currentUserId = userId;
     localStorage.setItem(
@@ -244,6 +275,6 @@ function selectUser(userId) {
         loadRequests();
     }
     if (pairingsDiv) {
-        loadPairings();
+        loadPairingsForCurrentUser();
     }
 }
