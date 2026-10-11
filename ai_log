@@ -105,3 +105,11 @@ Changed: Fixed excpetion handling
 Prompt - Asked Calude: Read app.js, Datastore.java, apicontroller.java and requestQuestion.java and write methods in app.js for the request questions page to submit a question request, admin question request list, and accept or reject a question. Make sure to add escapeHtml to remove all html script incase it is written. Write in javascript and make sure to use asyc for asynchronous requests. For submitting a question request, make sure to send the question and category to Jason file, show if successful, and refresh request list. 
 Produced: Produced expected code, but had several mistakes when adding api calls or POST requests which needed to be chnaged to match current methods and JASON files in apicontroller.java and data controller
 Changed: Modified code such as POST requests to /api/practice/admin/question-requests for accept or reject and also needed to add escapehtml to avoid script sending in admin question request list
+
+10/11/2026
+
+Prompt: Asked ChatGpt:"These are the current files for the project. Using these, generate a way to add a visible timestamp on a request when it is made and a timestamp for when the request is accepted."
+
+Produced:Produced code to generate timestamps and display them to the website as expected. Created get methods in practiceRequests.java and pairings.java. Edited the app.js load functions to display the timestamps with the rest of the information.
+
+Changed:Made edits to method names and edited the way the methods were called in app.js. 

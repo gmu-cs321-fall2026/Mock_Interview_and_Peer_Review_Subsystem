@@ -53,7 +53,7 @@ async function loadRequests() {
         const ownRequest =
             currentUserId === request.requesterUserId;
 
-        let requestCard = "<div class='card'>" + "Student " + request.requesterUserId;
+        let requestCard = "<div class='card'>" + "Student " + request.requesterUserId+"</strong></div>"+"<small>Created: "+formatTimestamp(request.timeCreated)+"</small>";
 
         if (ownRequest) {
             requestCard = requestCard + "<p>This is your request.</p>";
@@ -84,7 +84,7 @@ async function createRequest() {
     }
 
 
-    showMessage("Practice request created.");
+    //showMessage("Practice request created.");
     loadRequests();
 }
 
@@ -109,8 +109,7 @@ async function acceptRequest(requestId) {
         showMessage(data.error);
         return;
     }
-    const successMessage = "Student " + data.requesterUserId + " paired with Student " + data.partnerUserId + ".";
-    showMessage(successMessage);
+    
     loadRequests();
     loadPairings();
 }
@@ -157,8 +156,17 @@ async function loadPairings() {
 
         const pairingCard =
             "<div class='card'>" +
-                "<strong>Practice Partner:</strong> Student " +
-                otherUserId +
+                "<div>"+
+                    "<strong>Practice Partner:</strong> Student " +
+                    otherUserId +
+                "</div>"+
+                "<small>"+
+                    "Request created: "+
+                    formatTimestamp(pairing.timeCreated)+
+                    "<br>"+
+                    "Request accepted: "+
+                    formatTimestamp(pairing.timeAccepted)+
+                "</small>"+
             "</div>";
 
         pairingsDiv.innerHTML += pairingCard;
@@ -179,15 +187,32 @@ async function loadAdminPairings() {
         const pairing = pairings[i];
         const pairingCard =
             "<div class='card'>" +
-            "Student " + pairing.requesterUserId +
-            " paired with Student " + pairing.partnerUserId +
+                "<div>" +
+                    "Student " +
+                    pairing.requesterUserId +
+                    " paired with Student " +
+                    pairing.partnerUserId +
+                "</div>" +
+                "<small>" +
+                    "Request created: " +
+                    formatTimestamp(pairing.timeCreated) +
+                    "<br>" +
+                    "Request accepted: " +
+                    formatTimestamp(pairing.timeAccepted) +
+                "</small>" +
             "</div>";
+            
         pairingsDiv.innerHTML += pairingCard;
     }
 }
 
 function showMessage(text) {
     message.textContent = text;
+}
+//code for formatting timestamp||produced by ChatGPT||
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
 }
 
 if (categorySelect) {

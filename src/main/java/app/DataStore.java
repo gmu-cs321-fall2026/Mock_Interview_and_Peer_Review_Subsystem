@@ -124,7 +124,7 @@ public class DataStore {
     // otherwise accept it
     requestToAccept.accept();
     // pairing happens here
-    Pairing pairing = new Pairing(nextPairingId, requestToAccept.getId(), requestToAccept.getRequesterUserId(), userId);
+    Pairing pairing = new Pairing(nextPairingId, requestToAccept.getId(), requestToAccept.getRequesterUserId(), userId,requestToAccept.getTimeCreated(),System.currentTimeMillis());
     nextPairingId++;
     pairings.add(pairing); // add pairing to the list at the top
     return pairing;
