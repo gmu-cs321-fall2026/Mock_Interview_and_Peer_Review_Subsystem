@@ -78,4 +78,44 @@ public class ApiController {
     public List<User> getUsers() {
         return store.getUsers();
     }
+    //--- JASON PERM EDITED BY AI --
+    //Admin only: see every requested question
+    @GetMapping("/admin/question-requests")
+    public List<requestQuestion> getQuestionRequests(
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        requireAdmin(userId);
+        return store.getRequestedQuestions();
+    }
+ 
+    @PostMapping("/admin/question-requests/{id}/accept")
+    public requestQuestion acceptQuestionRequest(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        requireAdmin(userId);
+        return store.acceptRequestedQuestion(id);
+    }
+ 
+    @PostMapping("/admin/question-requests/{id}/reject")
+    public requestQuestion rejectQuestionRequest(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        requireAdmin(userId);
+        return store.rejectRequestedQuestion(id);
+    }
+ 
+    private void requireAdmin(int userId) {
+        User user = store.getUser(userId);
+        if (!user.isAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin access required.");
+        }
+    }
+
+    @PostMapping("/question-requests")
+    @ResponseStatus(HttpStatus.CREATED)
+    public requestQuestion submitQuestion(@RequestHeader("X-User-Id") int userId, @RequestBody Map<String, String> body) {
+        return store.submitQuestion(userId, body.get("text"), body.get("category"));
+    }
 }

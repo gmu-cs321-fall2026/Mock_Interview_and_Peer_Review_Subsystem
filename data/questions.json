@@ -1,0 +1,101 @@
+[ {
+  "id" : 1,
+  "text" : "Tell me about yourself.",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 2,
+  "text" : "Tell me about a time you faced a difficult challenge.",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 3,
+  "text" : "Describe a time when you worked successfully as part of a team.",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 4,
+  "text" : "Tell me about a time you made a mistake and what you learned from it.",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 5,
+  "text" : "Describe a situation where you had to meet a tight deadline.",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 6,
+  "text" : "Tell me about a time you disagreed with a teammate.",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 7,
+  "text" : "Describe a project you are particularly proud of.",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 8,
+  "text" : "How do you prioritize tasks when you have multiple deadlines?",
+  "category" : "BEHAVIORAL"
+}, {
+  "id" : 9,
+  "text" : "What is the difference between a stack and a queue?",
+  "category" : "TECHNICAL"
+}, {
+  "id" : 10,
+  "text" : "What is the difference between an array and a linked list?",
+  "category" : "TECHNICAL"
+}, {
+  "id" : 11,
+  "text" : "What is the purpose of an API?",
+  "category" : "TECHNICAL"
+}, {
+  "id" : 12,
+  "text" : "What is the difference between authentication and authorization?",
+  "category" : "TECHNICAL"
+}, {
+  "id" : 13,
+  "text" : "What is a database primary key?",
+  "category" : "TECHNICAL"
+}, {
+  "id" : 14,
+  "text" : "What is the purpose of version control systems such as Git?",
+  "category" : "TECHNICAL"
+}, {
+  "id" : 15,
+  "text" : "What is the difference between HTTP GET and POST requests?",
+  "category" : "TECHNICAL"
+}, {
+  "id" : 16,
+  "text" : "Estimate how many cups of coffee are sold on campus each day.",
+  "category" : "CASE"
+}, {
+  "id" : 17,
+  "text" : "How would you estimate the number of students who attend a career fair?",
+  "category" : "CASE"
+}, {
+  "id" : 18,
+  "text" : "A company has seen a 20% decrease in job applications. How would you investigate why?",
+  "category" : "CASE"
+}, {
+  "id" : 19,
+  "text" : "How would you design a system to help students find available mock interview partners?",
+  "category" : "CASE"
+}, {
+  "id" : 20,
+  "text" : "A website becomes significantly slower after a new feature is released. How would you troubleshoot the problem?",
+  "category" : "CASE"
+}, {
+  "id" : 21,
+  "text" : "How would you improve the process for matching students with mentors?",
+  "category" : "CASE"
+}, {
+  "id" : 22,
+  "text" : "Why are you interested in the technology industry?",
+  "category" : "INDUSTRY"
+}, {
+  "id" : 23,
+  "text" : "What technology trend do you think will have the biggest impact on software development?",
+  "category" : "INDUSTRY"
+}, {
+  "id" : 24,
+  "text" : "What skills do you think are most important for a successful software engineer?",
+  "category" : "INDUSTRY"
+}, {
+  "id" : 25,
+  "text" : "How do you stay informed about changes and developments in the technology industry?",
+  "category" : "INDUSTRY"
+} ]

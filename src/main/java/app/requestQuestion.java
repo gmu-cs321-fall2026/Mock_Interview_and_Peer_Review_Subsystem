@@ -1,13 +1,17 @@
 package app;
-
+ 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+ 
 public class requestQuestion {
     private int id; //Requested question ID
     private int UserId; //User ID of person who requested the question
     private String question; //Question itself
     private String category; //One of the 4 categories
-    private boolean status; //See if it has been accepted or rejected
-
-    public requestQuestion(int id, int UserId, String question, String category, boolean status) {
+    private String status; //See if it has been accepted or rejected
+ 
+    @JsonCreator
+    public requestQuestion(@JsonProperty("id") int id, @JsonProperty("userId") int UserId, @JsonProperty("question") String question, @JsonProperty("category") String category, @JsonProperty("status") String status) {
         this.id = id;
         this.UserId = UserId;
         this.question = question;
@@ -32,12 +36,18 @@ public class requestQuestion {
         return category;
     }
 
-    public boolean getStatus() {
+    public String getStatus() {
         return status;
     }
     
-    // Sets status to be true if accepted and false if rejected
-    public void setStatus(boolean status) {
-        this.status = status;
+    // Sets status as ACCEPT IF ACCPETED, REJECT IF REJECTED OR PRENDING IF PENDING
+    public void accept() {
+        this.status = "ACCEPT";
+    }
+        public void reject() {
+        this.status = "REJECT";
+    }
+        public void pending() {
+        this.status = "PENDING";
     }
 }

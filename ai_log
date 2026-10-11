@@ -93,3 +93,15 @@ Produced:
 </main>
 Changed: Its design implementation was not appealing, but some suggestions like using card class to add border and to orient the text area a certain way and place holder was valuable
 I kept those and removed majority of the color sheme changes. It also chnaged the vairable names to make it more "reader friendly" which I kept
+
+Prompt - Asked Calude: Read the files Datastore.java, requestQuestion.java, and Questions.java. I need 2 .jason files to help store questions and requested questions permenetly
+Produced: Mainly edited datastore, but it also changed other files, which are unnesssary, like it chnaged the way questions get accepted throgh Index
+Chnaged: kept most of the code, removed edits and redid some parts where it only goes from datastore and doesn't mess with acceptence in index.html
+
+Prompt - Asked Calude: Read the files Datastore.java, and requestQuestion.java to write methods for submitting question where if an admin submits, then it automatically enters the question list, but if a student eneters it, then it is put as pending and sent to request questions list. Also write the methods to add or reject questions
+Produced: Wrote all 3 methods and wrote an addition helper to get requested questions where it returns an array list when called. Slight modifications needed with exeptions, but works perfectly otherwise.
+Changed: Fixed excpetion handling
+
+Prompt - Asked Calude: Read app.js, Datastore.java, apicontroller.java and requestQuestion.java and write methods in app.js for the request questions page to submit a question request, admin question request list, and accept or reject a question. Make sure to add escapeHtml to remove all html script incase it is written. Write in javascript and make sure to use asyc for asynchronous requests. For submitting a question request, make sure to send the question and category to Jason file, show if successful, and refresh request list. 
+Produced: Produced expected code, but had several mistakes when adding api calls or POST requests which needed to be chnaged to match current methods and JASON files in apicontroller.java and data controller
+Changed: Modified code such as POST requests to /api/practice/admin/question-requests for accept or reject and also needed to add escapehtml to avoid script sending in admin question request list

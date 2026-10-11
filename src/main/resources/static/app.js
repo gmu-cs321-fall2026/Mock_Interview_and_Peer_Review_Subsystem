@@ -8,7 +8,7 @@ const pairingFilter = document.getElementById("pairingFilter");
 const userSwitcher = document.getElementById("userSwitcher");
 const currentUserText = document.getElementById("currentUser");
 let currentUserId = Number(localStorage.getItem("currentUserId"));
-
+ 
 if (!currentUserId) {
     currentUserId = 101;
 }
@@ -19,20 +19,20 @@ async function loadQuestions() {
     if (categorySelect.value !== "") {
         url = url + "?category=" + categorySelect.value;
     }
-
+ 
     const response = await fetch(url);
     const questions = await response.json();
-
+ 
     questionsDiv.innerHTML = "";
-
+ 
     for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         const questionCard =
             "<div class='card'>" +
-                "<div>" + question.text + "</div>" +
-                "<small>" + question.category + "</small>" +
+                "<div>" + escapeHtml(question.text) + "</div>" + //partial edit by adding escapehtml by Claude when doing jason
+                "<small>" + escapeHtml(question.category) + "</small>" +
             "</div>";
-
+ 
         questionsDiv.innerHTML = questionsDiv.innerHTML + questionCard;
     }
 }
@@ -232,7 +232,18 @@ async function loadUsers() {
 
         userSwitcher.appendChild(button);
     }
+    const currentUser = users.find(u => u.id === currentUserId);
+    const adminSection = document.getElementById("adminOnly");
+    if (adminSection) {
+        const isAdmin = currentUser && currentUser.role === "ADMIN";
+        adminSection.style.display = isAdmin ? "block" : "none";
+        if (isAdmin) {
+            loadQuestionRequests();
+        }
+    }
+
 }
+
 function selectUser(userId) {
     currentUserId = userId;
     localStorage.setItem(
@@ -247,3 +258,105 @@ function selectUser(userId) {
         loadPairings();
     }
 }
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+ 
+const submitQuestionButton = document.getElementById("submitQuestion");
+const questionRequestsDiv = document.getElementById("questionRequests");
+ 
+async function submitQuestion() {
+    const textBox = document.getElementById("questionText");
+    const categoryBox = document.getElementById("questionCategory");
+ 
+    const response = await fetch("/api/practice/question-requests", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-User-Id": currentUserId
+        },
+        body: JSON.stringify({
+            text: textBox.value,
+            category: categoryBox.value
+        })
+    });
+    const data = await response.json();
+ 
+    if (!response.ok) {
+        showMessage(data.error || data.message || "Something went wrong.");
+        return;
+    }
+ 
+    textBox.value = "";
+    if (data.status === "ACCEPT") {
+        showMessage("Question added to the question list.");
+    } else {
+        showMessage("Question sent to the admin for review.");
+    }
+    loadQuestionRequests();
+}
+ 
+//Admin only: lists every requested question with Accept / Reject buttons
+async function loadQuestionRequests() {
+    if (!questionRequestsDiv) {
+        return;
+    }
+    const response = await fetch("/api/practice/admin/question-requests", {
+        headers: { "X-User-Id": currentUserId }
+    });
+    if (!response.ok) {
+        questionRequestsDiv.innerHTML = "";
+        return;
+    }
+    const requests = await response.json();
+ 
+    if (requests.length === 0) {
+        questionRequestsDiv.innerHTML = "<p>No requested questions.</p>";
+        return;
+    }
+ 
+    questionRequestsDiv.innerHTML = "";
+    for (let i = 0; i < requests.length; i++) {
+        const r = requests[i];
+        let card =
+            "<div class='card'>" +
+                "<div>" + escapeHtml(r.question) + "</div>" +
+                "<small>" + escapeHtml(r.category) + " | Requested by user " + r.userId +
+                " | Status: " + escapeHtml(r.status) + "</small>";
+ 
+        if (r.status === "PENDING") {
+            card = card +
+                "<div style='margin-top:8px'>" +
+                    "<button onclick='reviewQuestion(" + r.id + ", \"accept\")'>Accept</button> " +
+                    "<button onclick='reviewQuestion(" + r.id + ", \"reject\")'>Reject</button>" +
+                "</div>";
+        }
+        card = card + "</div>";
+        questionRequestsDiv.innerHTML += card;
+    }
+}
+ 
+async function reviewQuestion(requestId, action) {
+    const response = await fetch(
+        "/api/practice/admin/question-requests/" + requestId + "/" + action,
+        {
+            method: "POST",
+            headers: { "X-User-Id": currentUserId }
+        }
+    );
+    const data = await response.json();
+ 
+    if (!response.ok) {
+        showMessage(data.error || data.message || "Something went wrong.");
+        return;
+    }
+    showMessage(action === "accept" ? "Question accepted and added." : "Question rejected.");
+    loadQuestionRequests();
+}
+ 
+if (submitQuestionButton) {
+    submitQuestionButton.addEventListener("click", submitQuestion);
+}
+ 

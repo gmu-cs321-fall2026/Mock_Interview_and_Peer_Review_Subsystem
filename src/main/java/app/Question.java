@@ -1,15 +1,20 @@
 package app;
-
+ 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+ 
 public class Question {
     private int id; //Question ID
     private String text; //Actual question
     private String category;//Which type of question it is
     //Constructor for Question class
-    public Question(int id, String text, String category) {
+    @JsonCreator
+    public Question(@JsonProperty("id") int id,@JsonProperty("text") String text,@JsonProperty("category") String category) {
         this.id = id;
         this.text = text;
         this.category = category;
     }
+
     //Getter methods for ID
     public int getId() {
         return id;
