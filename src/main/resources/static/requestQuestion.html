@@ -8,6 +8,7 @@
 
 <body>
 
+    <!-- Shared page header and demo user switcher-->
 <header>
     <h1>Mock Interview Practice</h1>
     <div class="user-area">
@@ -16,7 +17,7 @@
     </div>
     <a href="index.html">Questions</a>
 </header>
-
+<!-- Question submission form-->
 <main>
     <section>
         <h2>Suggest a New Interview Question</h2>
@@ -35,7 +36,7 @@
             <button id="submitQuestion">Submit Question</button>
         </div>
     </section>
-
+    <!-- Only shown when the selected user is an admin-->
     <section id="adminOnly" style="display: none;">
         <h2>Requested Questions</h2>
         <div id="questionRequests"></div>

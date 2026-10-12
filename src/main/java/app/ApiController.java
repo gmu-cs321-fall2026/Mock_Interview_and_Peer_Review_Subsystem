@@ -5,6 +5,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
 
+//REST Endpoints for the website
 @RestController
 @RequestMapping("/api/practice")
 public class ApiController {
@@ -12,6 +13,7 @@ public class ApiController {
     public ApiController(DataStore store) {
         this.store = store;
     }
+    //Returns all questions or a specific category
     @GetMapping("/questions")
     public List<Question> getQuestions(
             @RequestParam(required = false) String category
@@ -19,7 +21,7 @@ public class ApiController {
         List<Question> questions = store.getQuestions(category);
         return questions;
     }
-
+    //Returns the list of pratice requests
     @GetMapping("/requests")
     public List<PracticeRequest> getOpenRequests() {
         List<PracticeRequest> requests = store.getOpenRequests();
@@ -51,6 +53,7 @@ public class ApiController {
         Map<String, String> errorMessage = Map.of("error", exception.getMessage());
         return errorMessage;
     }
+    //Returns pairings that involve given user
     @GetMapping("/pairings")
     public List<Pairing> getMyPairings( 
             @RequestHeader("X-User-Id") int userId){
@@ -61,6 +64,7 @@ public class ApiController {
                 }
                 return store.getPairingsForUser(userId);
             }
+    //Admin-only endpoint for viewing all pairings
     @GetMapping("/admin/pairings")
     public List<Pairing> getAllPairings(
             @RequestHeader("X-User-Id") int userId
@@ -74,6 +78,7 @@ public class ApiController {
         }
         return store.getAllPairings();
     }
+    //Provides demo users for the frontend
     @GetMapping("/users")
     public List<User> getUsers() {
         return store.getUsers();
@@ -105,7 +110,6 @@ public class ApiController {
         requireAdmin(userId);
         return store.rejectRequestedQuestion(id);
     }
- 
     private void requireAdmin(int userId) {
         User user = store.getUser(userId);
         if (!user.isAdmin()) {
@@ -113,6 +117,7 @@ public class ApiController {
         }
     }
 
+    //Accepts a new question submission from the current user
     @PostMapping("/question-requests")
     @ResponseStatus(HttpStatus.CREATED)
     public requestQuestion submitQuestion(@RequestHeader("X-User-Id") int userId, @RequestBody Map<String, String> body) {

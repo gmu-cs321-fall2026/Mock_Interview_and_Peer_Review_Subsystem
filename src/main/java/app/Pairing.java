@@ -1,5 +1,6 @@
 package app;
 
+//Represents two users paired through an accepted pratice request
 public class Pairing {
 
     private int id;

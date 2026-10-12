@@ -1,3 +1,4 @@
+/* General page layout */
 body {
     font-family: Arial, sans-serif;
     max-width: 900px;
@@ -17,6 +18,7 @@ header,
 section {
     margin-top: 35px;
 }
+/* Shared card style for questions, requests, and pairings */
 .card {
     border: 1px solid #ccc;
     padding: 12px;
@@ -32,7 +34,7 @@ input {
 #message {
     font-weight: bold;
 }
-
+/* Stack controls vertically on smaller screens */
 @media (max-width: 600px) {
     body {
         width: 95%;
@@ -57,7 +59,7 @@ input {
         margin-bottom: 10px;
     }
 }
-
+/*Demo user selection shown in the page header */
 .user-area {
     display: flex;
     flex-direction: column;

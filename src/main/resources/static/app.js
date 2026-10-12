@@ -1,3 +1,4 @@
+//Page elements used by the different pratice pages.
 const categorySelect = document.getElementById("category");
 const questionsDiv = document.getElementById("questions");
 const requestsDiv = document.getElementById("requests");
@@ -7,24 +8,21 @@ const pairingsDiv = document.getElementById("pairings");
 const pairingFilter = document.getElementById("pairingFilter");
 const userSwitcher = document.getElementById("userSwitcher");
 const currentUserText = document.getElementById("currentUser");
+//Keep the selected demo user when moving between pages.
 let currentUserId = Number(localStorage.getItem("currentUserId"));
  
 if (!currentUserId) {
     currentUserId = 101;
 }
-
-
+//Loads interview questions with the option of filtering by category.
 async function loadQuestions() {
     let url = "/api/practice/questions";
     if (categorySelect.value !== "") {
         url = url + "?category=" + categorySelect.value;
     }
- 
     const response = await fetch(url);
     const questions = await response.json();
- 
     questionsDiv.innerHTML = "";
- 
     for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         const questionCard =
@@ -32,27 +30,22 @@ async function loadQuestions() {
                 "<div>" + escapeHtml(question.text) + "</div>" + //partial edit by adding escapehtml by Claude when doing jason
                 "<small>" + escapeHtml(question.category) + "</small>" +
             "</div>";
- 
         questionsDiv.innerHTML = questionsDiv.innerHTML + questionCard;
     }
 }
-
+//Loads all currently open practice requests.
 async function loadRequests() {
     const response = await fetch("/api/practice/requests");
     const requests = await response.json();
     requestsDiv.innerHTML = "";
-
     if (requests.length === 0) {
         requestsDiv.innerHTML = "<p>No open requests.</p>";
         return;
     }
-
-
     for (let i = 0; i < requests.length; i++) {
         const request = requests[i];
         const ownRequest =
             currentUserId === request.requesterUserId;
-
         let requestCard = "<div class='card'>" + "Student " + request.requesterUserId+"</strong></div>"+"<small>Created: "+formatTimestamp(request.timeCreated)+"</small>";
 
         if (ownRequest) {
@@ -65,7 +58,7 @@ async function loadRequests() {
     }
 }
 
-
+//Creates a new practice request for the given user.
 async function createRequest() {
     const response = await fetch(
             "/api/practice/requests",
@@ -82,16 +75,13 @@ async function createRequest() {
         showMessage(data.error);
         return;
     }
-
-
     //showMessage("Practice request created.");
     loadRequests();
 }
 
-
+//Accepts another student's practice request.
 async function acceptRequest(requestId) {
     const url = "/api/practice/requests/" + requestId + "/accept";
-
     const response =
         await fetch(url,
             {
@@ -109,7 +99,6 @@ async function acceptRequest(requestId) {
         showMessage(data.error);
         return;
     }
-    
     loadRequests();
     loadPairings();
 }
@@ -172,6 +161,8 @@ async function loadPairings() {
         pairingsDiv.innerHTML += pairingCard;
     }
 }
+
+//Admin view shows all pairings, not just those of the user
 async function loadAdminPairings() {
     const response = await fetch(
         "/api/practice/admin/pairings",
@@ -238,8 +229,8 @@ if (requestsDiv) {
 if (pairingsDiv) {
     loadPairingsForCurrentUser();
 }
+//Builds the demo user buttons and updates role-specific page selections.
 async function loadUsers() {
-
     const response =
         await fetch("/api/practice/users");
 
@@ -247,17 +238,12 @@ async function loadUsers() {
         await response.json();
 
     userSwitcher.innerHTML = "";
-
     for (let i = 0; i < users.length; i++) {
-
         const user = users[i];
-
         const button =
             document.createElement("button");
-
         button.textContent =
             user.name;
-
         if (user.id === currentUserId) {
             button.classList.add("selected-user");
 
@@ -268,7 +254,6 @@ async function loadUsers() {
                 user.role +
                 ")";
         }
-
         button.addEventListener(
             "click",
             function() {
@@ -289,7 +274,7 @@ async function loadUsers() {
     }
 
 }
-
+//Choose the student or admin pairing view based on selected role.
 async function loadPairingsForCurrentUser() {
     const response = await fetch("/api/practice/users");
     const users = await response.json();
@@ -300,6 +285,7 @@ async function loadPairingsForCurrentUser() {
         loadPairings();
     }
 }
+//Changes the active demo user and refreshes data shown on page.
 function selectUser(userId) {
     currentUserId = userId;
     localStorage.setItem(
@@ -314,15 +300,16 @@ function selectUser(userId) {
         loadPairingsForCurrentUser();
     }
 }
+// Converts user-entered text into safe text so it displays as text instead of HTML.
 function escapeHtml(text) {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
 }
- 
+
 const submitQuestionButton = document.getElementById("submitQuestion");
 const questionRequestsDiv = document.getElementById("questionRequests");
- 
+//Sends a suggested interview question to the backend
 async function submitQuestion() {
     const textBox = document.getElementById("questionText");
     const categoryBox = document.getElementById("questionCategory");
@@ -393,7 +380,8 @@ async function loadQuestionRequests() {
         questionRequestsDiv.innerHTML += card;
     }
 }
- 
+
+//Handles an admin accepting or rejecting a submitted question.
 async function reviewQuestion(requestId, action) {
     const response = await fetch(
         "/api/practice/admin/question-requests/" + requestId + "/" + action,

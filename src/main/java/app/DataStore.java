@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+//Stores subsystem data and handles simple JSON
 @Component
 public class DataStore {
   private List<Question> questions = new ArrayList<>(); // List of all the question

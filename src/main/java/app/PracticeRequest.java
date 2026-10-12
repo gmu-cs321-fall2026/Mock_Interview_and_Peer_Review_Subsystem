@@ -1,5 +1,6 @@
 package app;
 
+//Represents a user request to find a practice partner.
 public class PracticeRequest {
     private int id;
     private int requesterUserId;
@@ -26,9 +27,7 @@ public class PracticeRequest {
      public long getTimeCreated() {
         return timestamp;
     }
-
-
-
+    //Marks the request as no longer available
     public void accept() {
         status = "ACCEPTED";
     }

@@ -1,5 +1,6 @@
 package app;
 
+//Basic user account used for role checks
 public class User{
     private int id;
     private String name;
@@ -20,7 +21,7 @@ public class User{
     public String getRole() {
         return role;
     }
-
+    //Used by admin-only endpoints to check permissions.
     public boolean isAdmin() {
         return role.equals("ADMIN");
     }

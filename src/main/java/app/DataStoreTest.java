@@ -1,6 +1,3 @@
-
-    
-  
 package app;
 
 import java.util.List;
@@ -96,12 +93,6 @@ public class DataStoreTest {
         System.out.println("========================================");
     }
     
-
-
-    
-  
-
-
     private static void testCannotAcceptAlreadyAcceptedRequest(
             DataStore store,
             PracticeRequest request
@@ -147,10 +138,3 @@ public class DataStoreTest {
         }
     }
 }
-
-    
-
-
-    
-  
-        
