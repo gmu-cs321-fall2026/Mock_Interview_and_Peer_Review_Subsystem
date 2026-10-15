@@ -1,0 +1,17 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class Pairing_test {
+    @Test
+    public void testPairingCreation() {
+        // Create a new Pairing object
+        Pairing pairing = new Pairing(1, 1, 101, 102, 1620000000L, 1620003600L);
+
+        // Verify that the fields are set correctly
+        assertEquals(1, pairing.getId());
+        assertEquals(101, pairing.getRequesterUserId());
+        assertEquals(102, pairing.getPartnerUserId());
+        assertEquals(1620000000L, pairing.getTimeCreated());
+        assertEquals(1620003600L, pairing.getTimeAccepted());
+    }
+}
