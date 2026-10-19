@@ -19,10 +19,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-          cache: gradle
-
-      - name: Make the Gradle wrapper executable
-        run: chmod +x gradlew
+          cache: maven
 
       - name: Build and test
-        run: ./gradlew build
+        run: mvn -B clean verify
