@@ -1,14 +1,18 @@
 body {
     font-family: Arial, sans-serif;
     max-width: 900px;
+    width: 90%;
     margin: 30px auto;
     padding: 0 20px;
+    box-sizing: border-box;
 }
 header,
 .row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 section {
     margin-top: 35px;
@@ -17,12 +21,39 @@ section {
     border: 1px solid #ccc;
     padding: 12px;
     margin-top: 10px;
+    box-sizing: border-box;
 }
 button,
 select,
 input {
     padding: 7px;
+    box-sizing: border-box;
 }
 #message {
     font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    body {
+        width: 95%;
+        margin: 15px auto;
+        padding: 0 10px;
+    }
+
+    header,
+    .row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    input,
+    select,
+    button {
+        width: 100%;
+    }
+
+    h1,
+    h2 {
+        margin-bottom: 10px;
+    }
 }

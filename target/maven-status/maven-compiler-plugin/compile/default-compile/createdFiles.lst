@@ -5,3 +5,4 @@ app\Pairing.class
 app\Question.class
 app\DataStore.class
 app\PracticeRequest.class
+app\DataStoreTest.class

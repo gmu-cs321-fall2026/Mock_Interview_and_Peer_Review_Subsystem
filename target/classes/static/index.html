@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mock Interview Practice</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,7 +21,16 @@
             <option value="CASE">Case</option>
             <option value="INDUSTRY">Industry</option>
         </select>
-        <div id="questions"></div>
+        <center>
+            <div id="questions"></div>
+            <table id="buttonTable">
+                <tr>
+                    <button type="button" id="prevButton" disabled="disabled"></button>
+                    <label id="currPage"></label>
+                    <button type="button" id="nextButton" disabled="disabled"></button>
+                </tr>
+            </table>
+        </center>
     </section>
     <section>
         <div class="row">
@@ -29,13 +39,10 @@
         </div>
         <div id="requests"></div>
     </section>
-<<<<<<< HEAD
-=======
     <section>
         <h2>My Practice Partners</h2>
         <div id="pairings"></div>
     </section>
->>>>>>> 2d2b7671db7ab043705f0d2b448491dbecd1a02e
 </main>
 <p id="message"></p>
 <script src="app.js"></script>

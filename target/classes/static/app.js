@@ -4,11 +4,19 @@ const questionsDiv = document.getElementById("questions");
 const requestsDiv = document.getElementById("requests");
 const message = document.getElementById("message");
 const createRequestButton = document.getElementById("createRequest");
-<<<<<<< HEAD
-=======
 const pairingsDiv = document.getElementById("pairings");
->>>>>>> 2d2b7671db7ab043705f0d2b448491dbecd1a02e
-
+const nextButton = document.getElementById("nextButton");
+const prevButton = document.getElementById("prevButton");
+const currPage = document.getElementById("currPage");
+const buttonTable = document.getElementById("buttonTable");
+nextButton.addEventListener("click", incrementPage);
+prevButton.addEventListener("click", decrementPage);
+categorySelect.addEventListener("change", resetPageNum); // When switching question categories, reset pageNum
+var pageSize = 5; // set to 5 for testing purposes
+var pageStart = 0;
+var pageEnd = pageSize-1;
+var pageNum = 0;
+var numPages = 0;
 
 async function loadQuestions() {
     let url = "/api/practice/questions";
@@ -16,12 +24,35 @@ async function loadQuestions() {
         url = url + "?category=" + categorySelect.value;
     }
 
-    const response = await fetch(url);
-    const questions = await response.json();
+    var response = await fetch(url);
+    var questions = await response.json();
+
+    numPages = Math.ceil((questions.length / pageSize));    // ceiling function gets appropriate number of pages
+    // Page navigation buttons default to disabled
+    nextButton.setAttribute("disabled", "disabled");
+    prevButton.setAttribute("disabled", "disabled");
+    // If the current page is not the last page, then enable the next page button
+    if(pageNum < numPages-1){
+        nextButton.removeAttribute("disabled");
+    }
+    if(pageNum > 0){
+        prevButton.removeAttribute("disabled");
+    }
+    pageStart = pageNum * pageSize; // gets starting index of page in questions
+
+    // gets the ending index of page using starting index and page size.
+    pageEnd = pageStart + (pageSize - 1);
+    // If the page has less than pageSize questions and you are at the last page,
+    // then the ending index for the page should be the ending index for the 
+    // question bank. 
+    if((questions.length%pageSize > 0) && (pageNum == numPages-1)){
+        pageEnd = questions.length - 1;
+    }
 
     questionsDiv.innerHTML = "";
 
-    for (let i = 0; i < questions.length; i++) {
+    // Creates page of questions
+    for (let i = pageStart; i <= pageEnd; i++) {
         const question = questions[i];
         const questionCard =
             "<div class='card'>" +
@@ -31,6 +62,43 @@ async function loadQuestions() {
 
         questionsDiv.innerHTML = questionsDiv.innerHTML + questionCard;
     }
+    
+    // change the state of the next and prev buttons based on whether they are active or not
+    prevButton.innerText = "<- Prev";
+    
+    currPage.innerText = pageNum + 1;
+    
+    nextButton.innerText = "Next ->";
+}
+
+async function resetPageNum(){
+    pageNum = 0;
+}
+
+async function incrementPage(){
+    if(pageNum < (numPages-1)){
+        if(pageNum == 0){
+            prevButton.removeAttribute("disabled");
+        }
+        pageNum++;
+        if(pageNum == numPages-1){
+            nextButton.setAttribute("disabled", "disabled");
+        }
+    }
+    loadQuestions();
+}
+
+async function decrementPage(){
+    if(pageNum > 0){
+        if(pageNum == (numPages - 1)){
+            nextButton.removeAttribute("disabled");
+        }
+        pageNum--;
+        if(pageNum == 0){
+            prevButton.setAttribute("disabled", "disabled");
+        }
+    }
+    loadQuestions();
 }
 
 async function loadRequests() {
@@ -60,7 +128,6 @@ async function loadRequests() {
         requestsDiv.innerHTML = requestsDiv.innerHTML + requestCard;
     }
 }
-
 
 async function createRequest() {
     const response = await fetch(
@@ -108,10 +175,6 @@ async function acceptRequest(requestId) {
     const successMessage = "Student " + data.requesterUserId + " paired with Student " + data.partnerUserId + ".";
     showMessage(successMessage);
     loadRequests();
-<<<<<<< HEAD
-}
-
-=======
     loadPairings();
 }
 
@@ -173,20 +236,13 @@ async function loadPairings() {
 
 
 
->>>>>>> 2d2b7671db7ab043705f0d2b448491dbecd1a02e
 function showMessage(text) {
     message.textContent = text;
 }
 
 categorySelect.addEventListener("change", loadQuestions);
 createRequestButton.addEventListener("click", createRequest);
-<<<<<<< HEAD
-userIdInput.addEventListener("change", loadRequests);
-loadQuestions();
-loadRequests();
-=======
 userIdInput.addEventListener("change", function(){ loadRequests(); loadPairings();});
 loadQuestions();
 loadRequests();
 loadPairings();
->>>>>>> 2d2b7671db7ab043705f0d2b448491dbecd1a02e
