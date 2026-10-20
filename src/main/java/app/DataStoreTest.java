@@ -88,6 +88,37 @@ public class DataStoreTest {
         }
 
         System.out.println();
+        // cancel test
+        PracticeRequest cancelTest = store.createRequest(101);
+        store.cancelRequest(cancelTest.getId(), 101);
+        assertEquals("CANCELED", cancelTest.getStatus(),
+                "Request should be CANCELED");
+
+        System.out.println("PASS: Student can cancel their own open request.");
+        // Verify canceled requests disappear from available requests
+        assertEquals(false, store.getOpenRequests().contains(cancelTest),
+                "Canceled request should not appear in available requests");
+
+        System.out.println("PASS: Canceled request is no longer available.");
+        // Sprint 3 - Prevent cancellation by another student
+        PracticeRequest anotherRequest = store.createRequest(101);
+
+        try {
+            store.cancelRequest(anotherRequest.getId(), 102);
+
+            throw new AssertionError(
+                    "FAIL: Student 102 canceled Student 101's request."
+            );
+
+        } catch (IllegalArgumentException exception) {
+            System.out.println(
+                    "PASS: Student cannot cancel another student's request."
+            );
+        }
+
+// Verify the request is still OPEN
+        assertEquals("OPEN", anotherRequest.getStatus(),
+                "Unauthorized cancellation must not change the request status");
         System.out.println("========================================");
         System.out.println("ALL TESTS PASSED");
         System.out.println("========================================");
