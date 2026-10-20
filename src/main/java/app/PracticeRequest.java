@@ -34,6 +34,11 @@ public class PracticeRequest {
     }
     //Marks the request as no longer available
     public void accept() {
+
         status = "ACCEPTED";
+    }
+     // cancel the request
+    public void cancel() {
+        status = "CANCELED";
     }
 }

@@ -11,6 +11,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.HashMap;
 
 import org.springframework.stereotype.Component;
 
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class DataStore {
   private List<Question> questions = new ArrayList<>(); // List of all the question
   private List<PracticeRequest> requests = new ArrayList<>(); // List of requests sent by users
+  private Map<Integer, Set<Integer>> rejectedPartners = new HashMap<>();
   private List<Pairing> pairings = new ArrayList<>(); // Stores accpected user interview requests
   private List<User> users = new ArrayList<>(); // List of all users, be it student or admin
   private List<requestQuestion> requestQuestions = new ArrayList<>(); // List of all requested questions
@@ -125,6 +129,12 @@ public class DataStore {
     if (!requestToAccept.getStatus().equals("OPEN")) {
       throw new IllegalStateException("Practice request is no longer available.");
     }
+
+
+    if (rejectedPartners.getOrDefault(requestId, Set.of()).contains(userId)) {
+      throw new IllegalArgumentException(
+              "This student has been rejected for this practice request.");
+    }
     // otherwise accept it
     requestToAccept.accept();
     // pairing happens here
@@ -132,6 +142,66 @@ public class DataStore {
     nextPairingId++;
     pairings.add(pairing); // add pairing to the list at the top
     return pairing;
+  }
+  // cancel request method
+  public void cancelRequest(int requestId, int userId) {
+    PracticeRequest requestToCancel = null;
+    // loop through the list and find the request whose ID matches requestId
+    for (PracticeRequest request : requests) {
+      if (request.getId() == requestId) {
+        requestToCancel = request;
+        break;
+      }
+    }
+    // Handle a request that doesn't exist
+    if (requestToCancel == null) {
+      throw new IllegalArgumentException("Practice request not found.");
+    }
+    // verify ownership
+    if (requestToCancel.getRequesterUserId() != userId) {
+      throw new IllegalArgumentException(
+              "You cannot cancel another student's practice request."
+      );
+    }
+    // add the status validation
+    if (!requestToCancel.getStatus().equals("OPEN")) {
+      throw new IllegalStateException(
+              "Only open practice requests can be canceled."
+      );
+    }
+    // cancel the request
+    requestToCancel.cancel();
+  }
+  // Reject a potential practice partner
+  public void rejectPartner(int requestId, int partnerUserId) {
+    PracticeRequest requestToReject = null;
+
+    for (PracticeRequest request : requests) {
+      if (request.getId() == requestId) {
+        requestToReject = request;
+        break;
+      }
+    }
+    if (requestToReject == null) {
+      throw new IllegalArgumentException(
+              "Practice request not found."
+      );
+    }
+    // if the request is open
+    if (!requestToReject.getStatus().equals("OPEN")) {
+      throw new IllegalStateException(
+              "Only open practice requests can have partners rejected."
+      );
+    }
+    // checking that the partner is not the requester
+    if (requestToReject.getRequesterUserId() == partnerUserId) {
+      throw new IllegalArgumentException(
+              "A student cannot reject themselves as a partner."
+      );
+    }
+    rejectedPartners
+            .computeIfAbsent(requestId, id -> new HashSet<>())
+            .add(partnerUserId);
   }
 
   public List<Pairing> getPairingsForUser(int userId) {
