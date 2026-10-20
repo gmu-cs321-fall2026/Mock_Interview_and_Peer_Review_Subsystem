@@ -126,6 +126,12 @@ public class DataStore {
     if (!requestToAccept.getStatus().equals("OPEN")) {
       throw new IllegalStateException("Practice request is no longer available.");
     }
+
+
+    if (rejectedPartners.getOrDefault(requestId, Set.of()).contains(userId)) {
+      throw new IllegalArgumentException(
+              "This student has been rejected for this practice request.");
+    }
     // otherwise accept it
     requestToAccept.accept();
     // pairing happens here
