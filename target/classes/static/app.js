@@ -27,13 +27,6 @@ async function loadQuestions() {
     var response = await fetch(url);
     var questions = await response.json();
 
-<<<<<<< HEAD
-=======
-    //if(questions.length%pageSize > 0){
-        // TODO:    Padding filtered question bank to have pageSize * numPages questions in it
-        //          for beautification purposes.
-    //}
->>>>>>> 35f8eff7284cac915f8fcc117e669549d9e56aeb
     numPages = Math.ceil((questions.length / pageSize));    // ceiling function gets appropriate number of pages
     // Page navigation buttons default to disabled
     nextButton.setAttribute("disabled", "disabled");
@@ -69,10 +62,7 @@ async function loadQuestions() {
 
         questionsDiv.innerHTML = questionsDiv.innerHTML + questionCard;
     }
-<<<<<<< HEAD
     
-=======
->>>>>>> 35f8eff7284cac915f8fcc117e669549d9e56aeb
     // change the state of the next and prev buttons based on whether they are active or not
     prevButton.innerText = "<- Prev";
     
