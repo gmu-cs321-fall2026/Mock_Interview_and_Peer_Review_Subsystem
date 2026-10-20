@@ -404,3 +404,39 @@ if (submitQuestionButton) {
     submitQuestionButton.addEventListener("click", submitQuestion);
 }
  
+
+//Collapsible sidebar ---
+function openNav() {
+    const sidebar = document.getElementById("mySidebar");
+    if (!sidebar) {
+        return;
+    }
+    sidebar.classList.add("open");
+    document.getElementById("sidebarOverlay").classList.add("open");
+    document.getElementById("menuButton").setAttribute("aria-expanded", "true");
+}
+
+function closeNav() {
+    const sidebar = document.getElementById("mySidebar");
+    if (!sidebar) {
+        return;
+    }
+    sidebar.classList.remove("open");
+    document.getElementById("sidebarOverlay").classList.remove("open");
+    document.getElementById("menuButton").setAttribute("aria-expanded", "false");
+}
+
+//Pressing Escape also closes the sidebar
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        closeNav();
+    }
+});
+
+//Highlight the sidebar link for the page the user is currently on
+const currentPage = location.pathname.split("/").pop() || "index.html";
+document.querySelectorAll(".sidebar a").forEach(function(link) {
+    if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+    }
+});

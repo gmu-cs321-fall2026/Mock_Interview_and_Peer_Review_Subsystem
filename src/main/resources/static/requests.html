@@ -10,6 +10,7 @@
 
     <!-- Shared page header and demo user switcher-->
 <header>
+    <button id="menuButton" class="menu-button" onclick="openNav()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
     <h1>Mock Interview Practice</h1>
 
     <div class="user-area">
@@ -17,8 +18,16 @@
         <small id="currentUser"></small>
     </div>
 
-    <a href="index.html">Questions</a>
 </header>
+<!-- Collapsible sidebar navigation (opened with the menu button in the header) -->
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="closeNav()"></div>
+<nav id="mySidebar" class="sidebar" aria-label="Main navigation">
+    <button class="closebtn" onclick="closeNav()" aria-label="Close menu">&times;</button>
+    <a href="index.html">Questions</a>
+    <a href="requests.html">Practice Requests</a>
+    <a href="requestQuestion.html">Request a Question</a>
+</nav>
+
 
 <main>
     <!-- Open requests that can be created or accepted-->
