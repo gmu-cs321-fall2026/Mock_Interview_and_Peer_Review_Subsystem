@@ -9,14 +9,16 @@ public class Pairing {
     private int partnerUserId;
     private long timestampCreated;
     private long timestampAccepted;
+    private long scheduledFor;
 
-    public Pairing(int id, int requestId, int requesterUserId, int partnerUserId,long timestampCreated,long timestampAccepted) {
+    public Pairing(int id, int requestId, int requesterUserId, int partnerUserId,long timestampCreated,long timestampAccepted,long scheduledFor) {
         this.id = id;
         this.requestId = requestId;
         this.requesterUserId = requesterUserId;
         this.partnerUserId = partnerUserId;
         this.timestampCreated=timestampCreated;
         this.timestampAccepted=timestampAccepted;
+        this.scheduledFor=scheduledFor;
     }
     public int getId() {
         return id;
@@ -36,4 +38,7 @@ public class Pairing {
     public long getTimeAccepted(){
         return timestampAccepted;
     }
+    public long getScheduledFor() {
+    return scheduledFor;
+}
 }

@@ -87,8 +87,11 @@ public class DataStore {
     return matchingQuestions;
   }
 
-  public PracticeRequest createRequest(int userId) {
-    PracticeRequest request = new PracticeRequest(nextRequestId, userId);
+  public PracticeRequest createRequest(int userId,long scheduledFor) {
+    if(scheduledFor<=System.currentTimeMillis()){
+      throw new IllegalArgumentException("practice date and time must be in the future.");
+    }
+    PracticeRequest request = new PracticeRequest(nextRequestId, userId,scheduledFor);
     nextRequestId++;
     requests.add(request);
     return request;
@@ -125,7 +128,7 @@ public class DataStore {
     // otherwise accept it
     requestToAccept.accept();
     // pairing happens here
-    Pairing pairing = new Pairing(nextPairingId, requestToAccept.getId(), requestToAccept.getRequesterUserId(), userId,requestToAccept.getTimeCreated(),System.currentTimeMillis());
+    Pairing pairing = new Pairing(nextPairingId, requestToAccept.getId(), requestToAccept.getRequesterUserId(), userId,requestToAccept.getTimeCreated(),System.currentTimeMillis(),requestToAccept.getScheduledFor());
     nextPairingId++;
     pairings.add(pairing); // add pairing to the list at the top
     return pairing;
