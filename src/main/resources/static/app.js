@@ -50,6 +50,8 @@ async function loadRequests() {
 
         if (ownRequest) {
             requestCard = requestCard + "<p>This is your request.</p>";
+            requestCard = requestCard +
+                "<button onclick='cancelRequest(" + request.id + ")'>Cancel</button>";
         } else {
             requestCard = requestCard + "<button onclick='acceptRequest(" + request.id + ")'>Accept</button>";
         }
@@ -101,6 +103,28 @@ async function acceptRequest(requestId) {
     }
     loadRequests();
     loadPairings();
+}
+// Cancels the current student's own practice request.
+async function cancelRequest(requestId) {
+    const response = await fetch(
+        "/api/practice/requests/" + requestId + "/cancel",
+        {
+            method: "POST",
+            headers: {
+                "X-User-Id": currentUserId
+            }
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        showMessage(data.error || "Could not cancel request.");
+        return;
+    }
+
+    showMessage("Practice request canceled.");
+    loadRequests();
 }
 
 
