@@ -6,12 +6,14 @@ public class PracticeRequest {
     private int requesterUserId;
     private String status;
     private long timestamp;
+    private long scheduledFor;
 
-    public PracticeRequest(int id, int requesterUserId) {
+    public PracticeRequest(int id, int requesterUserId,long scheduledFor) {
         this.id = id;
         this.requesterUserId = requesterUserId;
         this.status = "OPEN";
         this.timestamp=System.currentTimeMillis();
+        this.scheduledFor=scheduledFor;
 
     }
     public int getId() {
@@ -26,6 +28,9 @@ public class PracticeRequest {
     }
      public long getTimeCreated() {
         return timestamp;
+    }
+    public long getScheduledFor(){
+        return scheduledFor;
     }
     //Marks the request as no longer available
     public void accept() {

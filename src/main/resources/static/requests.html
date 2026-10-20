@@ -44,6 +44,45 @@
         <div id="requests"></div>
 
     </section>
+    <div id="requestMenu" class="request-menu-overlay" hidden>
+        <div class="request-menu">
+            <h2>Create Practice Request</h2>
+
+            <form id="requestForm">
+                <label for="practiceDateTime">
+                    Practice Date and Time
+                </label>
+
+                <input
+                    id="practiceDateTime"
+                    type="datetime-local"
+                    step="60"
+                    required
+                >
+
+                <div class="request-menu-buttons">
+                    <button type="button" id="cancelRequest">
+                        Cancel
+                    </button>
+
+                    <button type="submit">
+                        Create Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
     <!-- Accepted pairings for the selected user-->
     <section>
         <div class="row">

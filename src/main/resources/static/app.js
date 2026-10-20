@@ -8,8 +8,13 @@ const pairingsDiv = document.getElementById("pairings");
 const pairingFilter = document.getElementById("pairingFilter");
 const userSwitcher = document.getElementById("userSwitcher");
 const currentUserText = document.getElementById("currentUser");
+const requestMenu=document.getElementById("requestMenu");
+const requestForm =document.getElementById("requestForm");
+const practiceDateTimeInput =document.getElementById("practiceDateTime");
+const cancelRequestButton =document.getElementById("cancelRequest");
 //Keep the selected demo user when moving between pages.
 let currentUserId = Number(localStorage.getItem("currentUserId"));
+
  
 if (!currentUserId) {
     currentUserId = 101;
@@ -43,30 +48,83 @@ async function loadRequests() {
         return;
     }
     for (let i = 0; i < requests.length; i++) {
-        const request = requests[i];
-        const ownRequest =
-            currentUserId === request.requesterUserId;
-        let requestCard = "<div class='card'>" + "Student " + request.requesterUserId+"</strong></div>"+"<small>Created: "+formatTimestamp(request.timeCreated)+"</small>";
+    const request = requests[i];
 
-        if (ownRequest) {
-            requestCard = requestCard + "<p>This is your request.</p>";
-        } else {
-            requestCard = requestCard + "<button onclick='acceptRequest(" + request.id + ")'>Accept</button>";
-        }
-        requestCard = requestCard + "</div>";
-        requestsDiv.innerHTML = requestsDiv.innerHTML + requestCard;
+    const ownRequest =
+        currentUserId === request.requesterUserId;
+
+    let requestCard =
+        "<div class='card'>" +
+
+            "<div>" +
+                "<strong>Student " +
+                request.requesterUserId +
+                "</strong>" +
+            "</div>" +
+
+            "<div class='request-time'>" +
+                "<small>" +
+                    "Created: " +
+                    formatTimestamp(request.timeCreated) +
+                "</small>" +
+            "</div>" +
+
+            "<div class='request-time'>" +
+                "<small>" +
+                    "<strong>Practice time:</strong> " +
+                    formatTimestamp(request.scheduledFor) +
+                "</small>" +
+            "</div>";
+
+    if (ownRequest) {
+        requestCard +=
+            "<div class='request-action'>" +
+                "This is your request." +
+            "</div>";
+    } else {
+        requestCard +=
+            "<div class='request-action'>" +
+                "<button onclick='acceptRequest(" +
+                request.id +
+                ")'>" +
+                    "Accept" +
+                "</button>" +
+            "</div>";
     }
+
+    requestCard += "</div>";
+
+    requestsDiv.innerHTML += requestCard;
+}
 }
 
 //Creates a new practice request for the given user.
-async function createRequest() {
+async function createRequest(event) {
+    event.preventDefault();
+    practiceDateTimeInput.setCustomValidity("");
+
+    if (!practiceDateTimeInput.reportValidity()) {
+        return;
+    }
+
+    const scheduledFor = new Date(practiceDateTimeInput.value).getTime();
+    if ( Number.isNaN(scheduledFor) ||scheduledFor <= Date.now()) {
+        practiceDateTimeInput.setCustomValidity("Please select a future date and time.");
+
+        practiceDateTimeInput.reportValidity();
+
+        return;
+    }
+
     const response = await fetch(
             "/api/practice/requests",
             {
                 method: "POST",
                 headers: {
+                    "Content-Type":"application/json",
                     "X-User-Id": currentUserId
-                }
+                },
+                body: JSON.stringify({scheduledFor:scheduledFor})
             }
         );
     const data =
@@ -76,6 +134,8 @@ async function createRequest() {
         return;
     }
     //showMessage("Practice request created.");
+    closeRequestMenu();
+    showMessage("");
     loadRequests();
 }
 
@@ -150,6 +210,10 @@ async function loadPairings() {
                     otherUserId +
                 "</div>"+
                 "<small>"+
+                    "<strong Practice time:</strong> "+
+                    formatTimestamp(pairing.scheduledFor)+
+                    "<br>"+
+
                     "Request created: "+
                     formatTimestamp(pairing.timeCreated)+
                     "<br>"+
@@ -206,13 +270,97 @@ function formatTimestamp(timestamp) {
     return date.toLocaleString();
 }
 
+//helper for minimum date ||produced by ChatGPT||
+function formatDateTimeInput(date) {
+    const year = date.getFullYear();
+
+    const month =
+        String(date.getMonth() + 1).padStart(2, "0");
+
+    const day =
+        String(date.getDate()).padStart(2, "0");
+
+    const hours =
+        String(date.getHours()).padStart(2, "0");
+
+    const minutes =
+        String(date.getMinutes()).padStart(2, "0");
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day +
+        "T" +
+        hours +
+        ":" +
+        minutes
+    );
+}
+//open the menu ||produced by ChatGPT||
+function openRequestMenu() {
+    if (!requestMenu || !practiceDateTimeInput) {
+        return;
+    }
+
+    practiceDateTimeInput.value = "";
+
+    practiceDateTimeInput.min =
+        formatDateTimeInput(new Date());
+
+    practiceDateTimeInput.setCustomValidity("");
+
+    requestMenu.hidden = false;
+
+    practiceDateTimeInput.focus();
+}
+//close the menu ||produced by ChatGPT||
+function closeRequestMenu() {
+    if (!requestMenu) {
+        return;
+    }
+
+    requestMenu.hidden = true;
+    if (practiceDateTimeInput) {
+        practiceDateTimeInput.value = "";
+        practiceDateTimeInput.setCustomValidity("");
+    }
+}
+
+
+
+
+
+
 if (categorySelect) {
     categorySelect.addEventListener("change", loadQuestions);
     loadQuestions();
 }
-
+//menu listeners ||produced by ChatGPT||
 if (createRequestButton) {
-    createRequestButton.addEventListener("click", createRequest);
+    createRequestButton.addEventListener("click", openRequestMenu);
+}
+if (requestForm) {
+    requestForm.addEventListener(
+        "submit",
+        createRequest
+    );
+}
+
+if (cancelRequestButton) {
+    cancelRequestButton.addEventListener(
+        "click",
+        closeRequestMenu
+    );
+}
+if (practiceDateTimeInput) {
+    practiceDateTimeInput.addEventListener(
+        "input",
+        function() {
+            practiceDateTimeInput.setCustomValidity("");
+        }
+    );
 }
 if (pairingFilter) {
     pairingFilter.addEventListener("change", loadPairings);

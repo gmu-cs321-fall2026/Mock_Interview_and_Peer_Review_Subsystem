@@ -125,3 +125,11 @@ Changed: Modified and changed code to integrate app.js created code into rest of
 Prompt:(Claude) Read through the 4 files and write me a good css for sidebar overlay
 Produced: Gave whole bunch of css code for sidebar design
 Changed: very little changes made, mainly changed how the color looks
+
+Prompt:(ChatGpt)"Using the code in the files as a base, generate code to make a menu appear when a user creates a practice request, this menu should prompt the user for a valid date and time. The date and time should be shown on the request post after it is made and the user should only be able to type in the date and time."
+Produced: Produced code for practicerequest.java, pairing.java, app.js,requests.html, and style.css. This code created a pop up menu that allowed a user to select a date and time by entering in numbers in a guided fashion. The menu provides exact space for date and time and will not let the user proceed until everything is correct.
+Changed: Adjusted code to fit better in and look neater. Very little changes to actual implementation. Added comments to show where AI code was added
+
+Prompt(ChatGpt)"adding the code as provided successfully creates the menu and allows for inputting date and time, however the menu does not close after the request is made and the date and time overwrites the created timestamp.  Additionally when other users view the request, the accept button is next to "practice time:" and the practice time is showing next to "created:"."
+Produced: Suggested fixes for app.js and style.css. Rewrote the function in app.js to show both timestamp and scheduled time. added two functions to style.css to show the date and time.
+changed:Did not change anything, fixes suggested worked when implemented.
