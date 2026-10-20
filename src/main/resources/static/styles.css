@@ -150,3 +150,54 @@ input {
     pointer-events: auto;
 }
 /* ------Collapsible sidebar ----- */
+
+/*----request menu-----*/
+.request-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.request-menu-overlay[hidden] {
+    display: none;
+}
+
+.request-menu {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 24px;
+    width: min(400px, 90%);
+    box-sizing: border-box;
+}
+
+.request-menu h2 {
+    margin-top: 0;
+}
+
+.request-menu form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.request-menu input {
+    width: 100%;
+}
+
+.request-menu-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+.request-time {
+    margin-top: 5px;
+}
+
+.request-action {
+    margin-top: 12px;
+}

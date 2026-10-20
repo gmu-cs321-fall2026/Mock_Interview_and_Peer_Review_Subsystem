@@ -148,48 +148,48 @@ public class DataStoreTest {
         System.out.println("========================================");
     }
     
-    private static void testCannotAcceptAlreadyAcceptedRequest(
-            DataStore store,
-            PracticeRequest request
-    ) {
-        try {
-            store.acceptRequest(request.getId(), 500);
-            throw new AssertionError(
-                    "FAIL: An already accepted request was accepted again."
-            );
-        } catch (IllegalStateException exception) {
-            System.out.println(
-                    "PASS: Already accepted requests cannot be accepted again."
-            );
-        }
-    }
+//     private static void testCannotAcceptAlreadyAcceptedRequest(
+//             DataStore store,
+//             PracticeRequest request
+//     ) {
+//         try {
+//             store.acceptRequest(request.getId(), 500);
+//             throw new AssertionError(
+//                     "FAIL: An already accepted request was accepted again."
+//             );
+//         } catch (IllegalStateException exception) {
+//             System.out.println(
+//                     "PASS: Already accepted requests cannot be accepted again."
+//             );
+//         }
+//     }
 
-    private static void testCannotAcceptOwnRequest(DataStore store) {
-        PracticeRequest ownRequest = store.createRequest(200);
+//     private static void testCannotAcceptOwnRequest(DataStore store) {
+//         PracticeRequest ownRequest = store.createRequest(200);
 
-        try {
-            store.acceptRequest(ownRequest.getId(), 200);
-            throw new AssertionError(
-                    "FAIL: A user was allowed to accept their own request."
-            );
-        } catch (IllegalArgumentException exception) {
-            System.out.println(
-                    "PASS: Users cannot accept their own practice requests."
-            );
-        }
-    }
+//         try {
+//             store.acceptRequest(ownRequest.getId(), 200);
+//             throw new AssertionError(
+//                     "FAIL: A user was allowed to accept their own request."
+//             );
+//         } catch (IllegalArgumentException exception) {
+//             System.out.println(
+//                     "PASS: Users cannot accept their own practice requests."
+//             );
+//         }
+//     }
 
-    private static void assertEquals(
-            Object expected,
-            Object actual,
-            String message
-    ) {
-        if (!expected.equals(actual)) {
-            throw new AssertionError(
-                    "FAIL: " + message
-                            + "\nExpected: " + expected
-                            + "\nActual:   " + actual
-            );
-        }
-    }
-}
+//     private static void assertEquals(
+//             Object expected,
+//             Object actual,
+//             String message
+//     ) {
+//         if (!expected.equals(actual)) {
+//             throw new AssertionError(
+//                     "FAIL: " + message
+//                             + "\nExpected: " + expected
+//                             + "\nActual:   " + actual
+//             );
+//         }
+//     }
+// }

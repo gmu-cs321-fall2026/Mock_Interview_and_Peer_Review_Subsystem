@@ -30,9 +30,14 @@ public class ApiController {
     @PostMapping("/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public PracticeRequest createRequest(
-            @RequestHeader("X-User-Id") int userId
+            @RequestHeader("X-User-Id") int userId,
+            @RequestBody Map<String, Long> body
     ) {
-        PracticeRequest request = store.createRequest(userId);
+        Long scheduledFor=body.get("scheduledFor");
+        if(scheduledFor==null){
+            throw new IllegalArgumentException("a practice date and time is required.");
+        }
+        PracticeRequest request = store.createRequest(userId,scheduledFor);
         return request;
     }
 
