@@ -113,3 +113,15 @@ Prompt: Asked ChatGpt:"These are the current files for the project. Using these,
 Produced:Produced code to generate timestamps and display them to the website as expected. Created get methods in practiceRequests.java and pairings.java. Edited the app.js load functions to display the timestamps with the rest of the information.
 
 Changed:Made edits to method names and edited the way the methods were called in app.js. 
+
+10/20/2026
+Prompt:(Claude) Using Index.html, request.html, app.js and requests.html's collable sidebar code, write me, in javascript, 
+the app.js code for opening and closing the collapasable side bar. Use event listener to track for any pressed key and 
+exit if esc is pressed. Make a way for the user to know what page they are on.
+
+Produced: Got expected code with minor changes needed to integrate into rest of the code.
+Changed: Modified and changed code to integrate app.js created code into rest of the system. Edits needed to be made when closing and opening since it doesn't close correctly.
+
+Prompt:(Claude) Read through the 4 files and write me a good css for sidebar overlay
+Produced: Gave whole bunch of css code for sidebar design
+Changed: very little changes made, mainly changed how the color looks
