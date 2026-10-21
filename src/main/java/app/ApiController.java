@@ -128,4 +128,26 @@ public class ApiController {
     public requestQuestion submitQuestion(@RequestHeader("X-User-Id") int userId, @RequestBody Map<String, String> body) {
         return store.submitQuestion(userId, body.get("text"), body.get("category"));
     }
+
+    // Get the current user's question statuses.
+    @GetMapping("/questions/statuses")
+    public Map<Integer, String> getQuestionStatuses(
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        return store.getQuestionStatuses(userId);
+    }
+
+    // Update one question's status for the current user.
+    @PutMapping("/questions/{id}/status")
+    public Map<String, String> setQuestionStatus(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId,
+            @RequestBody Map<String, String> body
+    ) {
+        String status = store.setQuestionStatus(
+            userId, id, body.get("status")
+        );
+
+        return Map.of("status", status);
+    }
 }

@@ -26,6 +26,7 @@ public class DataStore {
   private List<Pairing> pairings = new ArrayList<>(); // Stores accpected user interview requests
   private List<User> users = new ArrayList<>(); // List of all users, be it student or admin
   private List<requestQuestion> requestQuestions = new ArrayList<>(); // List of all requested questions
+  private Map<Integer, Map<Integer, String>> questionStatuses = new HashMap<>();
 
   // ---- Permanent storage (JSON files, created in a "data" folder next to where the server is run) ----
   private static final Path DATA_DIR = Paths.get("data");
@@ -33,6 +34,8 @@ public class DataStore {
   private static final Path QUESTION_REQUESTS_FILE = DATA_DIR.resolve("question_requests.json");
   private static final Set<String> VALID_CATEGORIES = Set.of("BEHAVIORAL", "TECHNICAL", "CASE", "INDUSTRY");
   private final ObjectMapper mapper = new ObjectMapper();
+  private static final Path QUESTION_STATUSES_FILE =
+        DATA_DIR.resolve("question_statuses.json");
 
   private int nextQuestionId = 1; // ID for the next question
   private int nextRequestQuesID = 1; // ID of requested question
@@ -313,6 +316,12 @@ public class DataStore {
       if (Files.exists(QUESTION_REQUESTS_FILE)) {
         requestQuestions = mapper.readValue(QUESTION_REQUESTS_FILE.toFile(), new TypeReference<List<requestQuestion>>() {});
       }
+      if (Files.exists(QUESTION_STATUSES_FILE)) {
+        questionStatuses = mapper.readValue(
+            QUESTION_STATUSES_FILE.toFile(),
+            new TypeReference<Map<Integer, Map<Integer, String>>>() {}
+        );
+      }
     } catch (IOException e) {
       throw new IllegalStateException("Could not load data files from the data folder.", e);
     }
@@ -340,5 +349,65 @@ public class DataStore {
     } catch (IOException e) {
       throw new IllegalStateException("Could not save question_requests.json", e);
     }
+  }
+  private void saveQuestionStatuses() {
+    try {
+        mapper.writerWithDefaultPrettyPrinter()
+              .writeValue(QUESTION_STATUSES_FILE.toFile(), questionStatuses);
+      } catch (IOException e) {
+          throw new IllegalStateException("Could not save question statuses.", e);
+      }
+  }
+  // Return the selected user's saved question statuses.
+  public synchronized Map<Integer, String> getQuestionStatuses(int userId) {
+      getUser(userId);
+
+      Map<Integer, String> statuses = questionStatuses.get(userId);
+
+      if (statuses == null) {
+          return new HashMap<>();
+      }
+
+      return new HashMap<>(statuses);
+  }
+
+  // Change the status of one question for one user.
+  public synchronized String setQuestionStatus(int userId, int questionId, String status) {
+      getUser(userId);
+
+      boolean found = false;
+
+      for (Question question : questions) {
+          if (question.getId() == questionId) {
+              found = true;
+              break;
+          }
+      }
+
+      if (!found) {
+          throw new IllegalArgumentException("Question not found.");
+      }
+
+      if (!"DONE".equals(status) &&
+          !"REVIEW".equals(status) &&
+          !"NOT_REVIEWED".equals(status)) {
+          throw new IllegalArgumentException("Invalid question status.");
+      }
+
+      Map<Integer, String> statuses = questionStatuses.get(userId);
+
+      if (statuses == null) {
+          statuses = new HashMap<>();
+          questionStatuses.put(userId, statuses);
+      }
+
+      if (status.equals("NOT_REVIEWED")) {
+          statuses.remove(questionId);
+      } else {
+          statuses.put(questionId, status);
+      }
+
+      saveQuestionStatuses();
+      return status;
   }
 }
