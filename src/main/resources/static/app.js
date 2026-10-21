@@ -71,7 +71,7 @@ async function loadQuestions() {
     if (pageNum * pageSize >= questions.length) {
         pageNum = 0;
     }
-    
+
     numPages = Math.ceil((questions.length / pageSize));    // ceiling function gets appropriate number of pages
     // Page navigation buttons default to disabled
     nextButton.setAttribute("disabled", "disabled");
@@ -88,8 +88,8 @@ async function loadQuestions() {
     // gets the ending index of page using starting index and page size.
     pageEnd = pageStart + (pageSize - 1);
     // If the page has less than pageSize questions and you are at the last page,
-    // then the ending index for the page should be the ending index for the 
-    // question bank. 
+    // then the ending index for the page should be the ending index for the
+    // question bank.
     if((questions.length%pageSize > 0) && (pageNum == numPages-1)){
         pageEnd = questions.length - 1;
     }
@@ -124,12 +124,12 @@ async function loadQuestions() {
             "</div>";
         questionsDiv.innerHTML = questionsDiv.innerHTML + questionCard;
     }
-    
+
     // change the state of the next and prev buttons based on whether they are active or not
     prevButton.innerText = "<- Prev";
-    
+
     currPage.innerText = pageNum + 1;
-    
+
     nextButton.innerText = "Next ->";
 }
 
@@ -235,7 +235,7 @@ async function loadRequests() {
     if (ownRequest) {
         requestCard +=
             "<div class='request-action'>" +
-                "This is your request." +
+                "This is your request." + "<button onclick='cancelRequest(" + request.id + ")'>Cancel</button>" +
             "</div>";
     } else {
         requestCard +=
@@ -314,8 +314,31 @@ async function acceptRequest(requestId) {
         showMessage(data.error);
         return;
     }
+    showMessage("Practice request accepted.");
     loadRequests();
     loadPairings();
+}
+// Cancels the current student's own practice request.
+async function cancelRequest(requestId) {
+    const response = await fetch(
+        "/api/practice/requests/" + requestId + "/cancel",
+        {
+            method: "POST",
+            headers: {
+                "X-User-Id": currentUserId
+            }
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        showMessage(data.error || "Could not cancel request.");
+        return;
+    }
+
+    showMessage("Practice request canceled.");
+    loadRequests();
 }
 
 
@@ -597,6 +620,7 @@ async function loadPairingsForCurrentUser() {
 //Changes the active demo user and refreshes data shown on page.
 function selectUser(userId) {
     currentUserId = userId;
+    showMessage("");
     localStorage.setItem(
         "currentUserId",
         userId

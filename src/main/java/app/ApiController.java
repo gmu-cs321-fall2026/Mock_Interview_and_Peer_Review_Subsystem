@@ -49,6 +49,16 @@ public class ApiController {
         Pairing pairing = store.acceptRequest(id, userId);
         return pairing;
     }
+    @PostMapping("/requests/{id}/cancel")
+    public Map<String, String> cancelRequest(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        store.cancelRequest(id, userId);
+        return Map.of("message", "Practice request canceled.");
+    }
+
+
     @ExceptionHandler({
             IllegalArgumentException.class,
             IllegalStateException.class
