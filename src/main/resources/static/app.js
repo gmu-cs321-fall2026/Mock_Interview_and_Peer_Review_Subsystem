@@ -18,6 +18,7 @@ let currentUserId = Number(localStorage.getItem("currentUserId"));
 const prevButton = document.getElementById("prevButton");
 const currPage = document.getElementById("currPage");
 const buttonTable = document.getElementById("buttonTable");
+const readinessFilter = document.getElementById("readinessFilter");
 if (nextButton) {
     nextButton.addEventListener("click", incrementPage);
 }
@@ -45,6 +46,31 @@ async function loadQuestions() {
     }
     var response = await fetch(url);
     var questions = await response.json();
+    // Load saved question statuses for the current user.
+    const statusResponse = await fetch("/api/practice/questions/statuses", {
+        headers: {
+            "X-User-Id": currentUserId
+        }
+    });
+
+    if (!statusResponse.ok) {
+        questionsDiv.textContent = "Could not load question statuses.";
+        return;
+    }
+
+    const statuses = await statusResponse.json();
+
+    // Filter questions by readiness, if selected.
+    if (readinessFilter.value !== "") {
+        questions = questions.filter(question =>
+            (statuses[question.id] || "NOT_REVIEWED") === readinessFilter.value
+        );
+    }
+
+    // Keep the current page valid when filtering changes the number of questions.
+    if (pageNum * pageSize >= questions.length) {
+        pageNum = 0;
+    }
     
     numPages = Math.ceil((questions.length / pageSize));    // ceiling function gets appropriate number of pages
     // Page navigation buttons default to disabled
@@ -68,13 +94,33 @@ async function loadQuestions() {
         pageEnd = questions.length - 1;
     }
     questionsDiv.innerHTML = "";
+    if (questions.length === 0) {
+        questionsDiv.innerHTML = "<p>No questions match these filters.</p>";
+        currPage.innerText = "0";
+        return;
+    }
     // Creates page of questions
     for (let i = pageStart; i <= pageEnd; i++) {
         const question = questions[i];
+        const status = statuses[question.id] || "NOT_REVIEWED";
+
         const questionCard =
             "<div class='card'>" +
-                "<div>" + escapeHtml(question.text) + "</div>" + //partial edit by adding escapehtml by Claude when doing jason
+                "<div>" + escapeHtml(question.text) + "</div>" +
                 "<small>" + escapeHtml(question.category) + "</small>" +
+                "<div class='readiness-checkboxes'>" +
+
+                "<label><input type='checkbox' " +
+                    (status === "DONE" ? "checked" : "") +
+                    " onchange='updateQuestionStatus(" +
+                    question.id + ", \"DONE\", this.checked)'> Done</label>" +
+
+                "<label><input type='checkbox' " +
+                    (status === "REVIEW" ? "checked" : "") +
+                    " onchange='updateQuestionStatus(" +
+                    question.id + ", \"REVIEW\", this.checked)'> Review</label>" +
+                "</div>" +
+
             "</div>";
         questionsDiv.innerHTML = questionsDiv.innerHTML + questionCard;
     }
@@ -85,6 +131,38 @@ async function loadQuestions() {
     currPage.innerText = pageNum + 1;
     
     nextButton.innerText = "Next ->";
+}
+
+async function updateQuestionStatus(questionId, selectedStatus, checked) {
+
+    // Unchecking the selected box returns the question to Not Reviewed.
+    let status = "NOT_REVIEWED";
+
+    if (checked) {
+        status = selectedStatus;
+    }
+
+    const response = await fetch(
+        "/api/practice/questions/" + questionId + "/status",
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-User-Id": currentUserId
+            },
+            body: JSON.stringify({
+                status: status
+            })
+        }
+    );
+
+    if (!response.ok) {
+        const data = await response.json();
+        alert(data.error || "Could not update question status.");
+    }
+
+    // Reload to update both checkboxes and the filtered list.
+    loadQuestions();
 }
 
 async function resetPageNum(){
@@ -454,6 +532,12 @@ if (requestsDiv) {
 if (pairingsDiv) {
     loadPairingsForCurrentUser();
 }
+if (readinessFilter) {
+    readinessFilter.addEventListener("change", function() {
+        pageNum = 0;
+        loadQuestions();
+    });
+}
 //Builds the demo user buttons and updates role-specific page selections.
 async function loadUsers() {
     const response =
@@ -523,6 +607,10 @@ function selectUser(userId) {
     }
     if (pairingsDiv) {
         loadPairingsForCurrentUser();
+    }
+    if (questionsDiv) {
+        pageNum = 0;
+        loadQuestions();
     }
 }
 // Converts user-entered text into safe text so it displays as text instead of HTML.
