@@ -101,6 +101,7 @@ async function acceptRequest(requestId) {
         showMessage(data.error);
         return;
     }
+    showMessage("Practice request accepted.");
     loadRequests();
     loadPairings();
 }
@@ -312,6 +313,7 @@ async function loadPairingsForCurrentUser() {
 //Changes the active demo user and refreshes data shown on page.
 function selectUser(userId) {
     currentUserId = userId;
+    showMessage("");
     localStorage.setItem(
         "currentUserId",
         userId

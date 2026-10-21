@@ -115,6 +115,19 @@ public class DataStoreTest {
                     "PASS: Student cannot cancel another student's request."
             );
         }
+        // Verify canceling one request does not affect another
+        PracticeRequest student1Request = store.createRequest(101);
+        PracticeRequest student2Request = store.createRequest(102);
+
+        store.cancelRequest(student1Request.getId(), 101);
+
+        assertEquals("CANCELED", student1Request.getStatus(),
+                "Student 1's request should be canceled");
+
+        assertEquals("OPEN", student2Request.getStatus(),
+                "Student 2's request should remain OPEN");
+
+        System.out.println("PASS: Canceling one request does not affect another.");
 
 // Verify the request is still OPEN
         assertEquals("OPEN", anotherRequest.getStatus(),
