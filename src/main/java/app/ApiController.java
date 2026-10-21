@@ -30,9 +30,14 @@ public class ApiController {
     @PostMapping("/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public PracticeRequest createRequest(
-            @RequestHeader("X-User-Id") int userId
+            @RequestHeader("X-User-Id") int userId,
+            @RequestBody Map<String, Long> body
     ) {
-        PracticeRequest request = store.createRequest(userId);
+        Long scheduledFor=body.get("scheduledFor");
+        if(scheduledFor==null){
+            throw new IllegalArgumentException("a practice date and time is required.");
+        }
+        PracticeRequest request = store.createRequest(userId,scheduledFor);
         return request;
     }
 
@@ -132,5 +137,27 @@ public class ApiController {
     @ResponseStatus(HttpStatus.CREATED)
     public requestQuestion submitQuestion(@RequestHeader("X-User-Id") int userId, @RequestBody Map<String, String> body) {
         return store.submitQuestion(userId, body.get("text"), body.get("category"));
+    }
+
+    // Get the current user's question statuses.
+    @GetMapping("/questions/statuses")
+    public Map<Integer, String> getQuestionStatuses(
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        return store.getQuestionStatuses(userId);
+    }
+
+    // Update one question's status for the current user.
+    @PutMapping("/questions/{id}/status")
+    public Map<String, String> setQuestionStatus(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId,
+            @RequestBody Map<String, String> body
+    ) {
+        String status = store.setQuestionStatus(
+            userId, id, body.get("status")
+        );
+
+        return Map.of("status", status);
     }
 }

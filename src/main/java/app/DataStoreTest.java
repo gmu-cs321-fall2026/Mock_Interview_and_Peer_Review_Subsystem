@@ -6,18 +6,19 @@ public class DataStoreTest {
 
     public static void main(String[] args) {
         DataStore store = new DataStore();
+        long scheduledFor = System.currentTimeMillis() + 86_400_000L;
 
         System.out.println("=== Practice Request / Pairing Test ===");
 
         // User 101 creates a request
-        PracticeRequest request1 = store.createRequest(101);
+        PracticeRequest request1 = store.createRequest(101, scheduledFor);
         assertEquals(101, request1.getRequesterUserId(),
                 "Request 1 should belong to user 101");
         assertEquals("OPEN", request1.getStatus(),
                 "New request should start as OPEN");
 
         // User 103 creates another request
-        PracticeRequest request2 = store.createRequest(103);
+        PracticeRequest request2 = store.createRequest(103, scheduledFor);
         assertEquals(103, request2.getRequesterUserId(),
                 "Request 2 should belong to user 103");
 
@@ -89,7 +90,7 @@ public class DataStoreTest {
 
         System.out.println();
         // cancel test
-        PracticeRequest cancelTest = store.createRequest(101);
+        PracticeRequest cancelTest = store.createRequest(101, scheduledFor);
         store.cancelRequest(cancelTest.getId(), 101);
         assertEquals("CANCELED", cancelTest.getStatus(),
                 "Request should be CANCELED");
@@ -101,7 +102,7 @@ public class DataStoreTest {
 
         System.out.println("PASS: Canceled request is no longer available.");
         // Sprint 3 - Prevent cancellation by another student
-        PracticeRequest anotherRequest = store.createRequest(101);
+        PracticeRequest anotherRequest = store.createRequest(101, scheduledFor);
 
         try {
             store.cancelRequest(anotherRequest.getId(), 102);
@@ -116,8 +117,8 @@ public class DataStoreTest {
             );
         }
         // Verify canceling one request does not affect another
-        PracticeRequest student1Request = store.createRequest(101);
-        PracticeRequest student2Request = store.createRequest(102);
+        PracticeRequest student1Request = store.createRequest(101, scheduledFor);
+        PracticeRequest student2Request = store.createRequest(102, scheduledFor);
 
         store.cancelRequest(student1Request.getId(), 101);
 
@@ -133,7 +134,7 @@ public class DataStoreTest {
         assertEquals("OPEN", anotherRequest.getStatus(),
                 "Unauthorized cancellation must not change the request status");
         // Test partner rejection
-        PracticeRequest rejectionTest = store.createRequest(101);
+        PracticeRequest rejectionTest = store.createRequest(101, scheduledFor);
 
         store.rejectPartner(rejectionTest.getId(), 102);
 
@@ -160,7 +161,6 @@ public class DataStoreTest {
         System.out.println("ALL TESTS PASSED");
         System.out.println("========================================");
     }
-    
     private static void testCannotAcceptAlreadyAcceptedRequest(
             DataStore store,
             PracticeRequest request
@@ -178,7 +178,7 @@ public class DataStoreTest {
     }
 
     private static void testCannotAcceptOwnRequest(DataStore store) {
-        PracticeRequest ownRequest = store.createRequest(200);
+        PracticeRequest ownRequest = store.createRequest(200, System.currentTimeMillis() + 86_400_000L);
 
         try {
             store.acceptRequest(ownRequest.getId(), 200);

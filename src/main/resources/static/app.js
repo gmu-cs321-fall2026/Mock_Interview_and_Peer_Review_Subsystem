@@ -8,9 +8,33 @@ const pairingsDiv = document.getElementById("pairings");
 const pairingFilter = document.getElementById("pairingFilter");
 const userSwitcher = document.getElementById("userSwitcher");
 const currentUserText = document.getElementById("currentUser");
+const requestMenu=document.getElementById("requestMenu");
+const requestForm =document.getElementById("requestForm");
+const practiceDateTimeInput =document.getElementById("practiceDateTime");
+const cancelRequestButton =document.getElementById("cancelRequest");
 //Keep the selected demo user when moving between pages.
 let currentUserId = Number(localStorage.getItem("currentUserId"));
- 
+ const nextButton = document.getElementById("nextButton");
+const prevButton = document.getElementById("prevButton");
+const currPage = document.getElementById("currPage");
+const buttonTable = document.getElementById("buttonTable");
+const readinessFilter = document.getElementById("readinessFilter");
+if (nextButton) {
+    nextButton.addEventListener("click", incrementPage);
+}
+
+if (prevButton) {
+    prevButton.addEventListener("click", decrementPage);
+}
+
+if (categorySelect) {
+    categorySelect.addEventListener("change", resetPageNum);
+}
+var pageSize = 5; // set to 5 for testing purposes
+var pageStart = 0;
+var pageEnd = pageSize-1;
+var pageNum = 0;
+var numPages = 0;
 if (!currentUserId) {
     currentUserId = 101;
 }
@@ -20,18 +44,155 @@ async function loadQuestions() {
     if (categorySelect.value !== "") {
         url = url + "?category=" + categorySelect.value;
     }
-    const response = await fetch(url);
-    const questions = await response.json();
+    var response = await fetch(url);
+    var questions = await response.json();
+    // Load saved question statuses for the current user.
+    const statusResponse = await fetch("/api/practice/questions/statuses", {
+        headers: {
+            "X-User-Id": currentUserId
+        }
+    });
+
+    if (!statusResponse.ok) {
+        questionsDiv.textContent = "Could not load question statuses.";
+        return;
+    }
+
+    const statuses = await statusResponse.json();
+
+    // Filter questions by readiness, if selected.
+    if (readinessFilter.value !== "") {
+        questions = questions.filter(question =>
+            (statuses[question.id] || "NOT_REVIEWED") === readinessFilter.value
+        );
+    }
+
+    // Keep the current page valid when filtering changes the number of questions.
+    if (pageNum * pageSize >= questions.length) {
+        pageNum = 0;
+    }
+
+    numPages = Math.ceil((questions.length / pageSize));    // ceiling function gets appropriate number of pages
+    // Page navigation buttons default to disabled
+    nextButton.setAttribute("disabled", "disabled");
+    prevButton.setAttribute("disabled", "disabled");
+    // If the current page is not the last page, then enable the next page button
+    if(pageNum < numPages-1){
+        nextButton.removeAttribute("disabled");
+    }
+    if(pageNum > 0){
+        prevButton.removeAttribute("disabled");
+    }
+    pageStart = pageNum * pageSize; // gets starting index of page in questions
+
+    // gets the ending index of page using starting index and page size.
+    pageEnd = pageStart + (pageSize - 1);
+    // If the page has less than pageSize questions and you are at the last page,
+    // then the ending index for the page should be the ending index for the
+    // question bank.
+    if((questions.length%pageSize > 0) && (pageNum == numPages-1)){
+        pageEnd = questions.length - 1;
+    }
     questionsDiv.innerHTML = "";
-    for (let i = 0; i < questions.length; i++) {
+    if (questions.length === 0) {
+        questionsDiv.innerHTML = "<p>No questions match these filters.</p>";
+        currPage.innerText = "0";
+        return;
+    }
+    // Creates page of questions
+    for (let i = pageStart; i <= pageEnd; i++) {
         const question = questions[i];
+        const status = statuses[question.id] || "NOT_REVIEWED";
+
         const questionCard =
             "<div class='card'>" +
-                "<div>" + escapeHtml(question.text) + "</div>" + //partial edit by adding escapehtml by Claude when doing jason
+                "<div>" + escapeHtml(question.text) + "</div>" +
                 "<small>" + escapeHtml(question.category) + "</small>" +
+                "<div class='readiness-checkboxes'>" +
+
+                "<label><input type='checkbox' " +
+                    (status === "DONE" ? "checked" : "") +
+                    " onchange='updateQuestionStatus(" +
+                    question.id + ", \"DONE\", this.checked)'> Done</label>" +
+
+                "<label><input type='checkbox' " +
+                    (status === "REVIEW" ? "checked" : "") +
+                    " onchange='updateQuestionStatus(" +
+                    question.id + ", \"REVIEW\", this.checked)'> Review</label>" +
+                "</div>" +
+
             "</div>";
         questionsDiv.innerHTML = questionsDiv.innerHTML + questionCard;
     }
+
+    // change the state of the next and prev buttons based on whether they are active or not
+    prevButton.innerText = "<- Prev";
+
+    currPage.innerText = pageNum + 1;
+
+    nextButton.innerText = "Next ->";
+}
+
+async function updateQuestionStatus(questionId, selectedStatus, checked) {
+
+    // Unchecking the selected box returns the question to Not Reviewed.
+    let status = "NOT_REVIEWED";
+
+    if (checked) {
+        status = selectedStatus;
+    }
+
+    const response = await fetch(
+        "/api/practice/questions/" + questionId + "/status",
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-User-Id": currentUserId
+            },
+            body: JSON.stringify({
+                status: status
+            })
+        }
+    );
+
+    if (!response.ok) {
+        const data = await response.json();
+        alert(data.error || "Could not update question status.");
+    }
+
+    // Reload to update both checkboxes and the filtered list.
+    loadQuestions();
+}
+
+async function resetPageNum(){
+    pageNum = 0;
+}
+
+async function incrementPage(){
+    if(pageNum < (numPages-1)){
+        if(pageNum == 0){
+            prevButton.removeAttribute("disabled");
+        }
+        pageNum++;
+        if(pageNum == numPages-1){
+            nextButton.setAttribute("disabled", "disabled");
+        }
+    }
+    loadQuestions();
+}
+
+async function decrementPage(){
+    if(pageNum > 0){
+        if(pageNum == (numPages - 1)){
+            nextButton.removeAttribute("disabled");
+        }
+        pageNum--;
+        if(pageNum == 0){
+            prevButton.setAttribute("disabled", "disabled");
+        }
+    }
+    loadQuestions();
 }
 //Loads all currently open practice requests.
 async function loadRequests() {
@@ -43,32 +204,82 @@ async function loadRequests() {
         return;
     }
     for (let i = 0; i < requests.length; i++) {
-        const request = requests[i];
-        const ownRequest =
-            currentUserId === request.requesterUserId;
-        let requestCard = "<div class='card'>" + "Student " + request.requesterUserId+"</strong></div>"+"<small>Created: "+formatTimestamp(request.timeCreated)+"</small>";
+    const request = requests[i];
 
-        if (ownRequest) {
-            requestCard = requestCard + "<p>This is your request.</p>";
-            requestCard = requestCard +
-                "<button onclick='cancelRequest(" + request.id + ")'>Cancel</button>";
-        } else {
-            requestCard = requestCard + "<button onclick='acceptRequest(" + request.id + ")'>Accept</button>";
-        }
-        requestCard = requestCard + "</div>";
-        requestsDiv.innerHTML = requestsDiv.innerHTML + requestCard;
+    const ownRequest =
+        currentUserId === request.requesterUserId;
+
+    let requestCard =
+        "<div class='card'>" +
+
+            "<div>" +
+                "<strong>Student " +
+                request.requesterUserId +
+                "</strong>" +
+            "</div>" +
+
+            "<div class='request-time'>" +
+                "<small>" +
+                    "Created: " +
+                    formatTimestamp(request.timeCreated) +
+                "</small>" +
+            "</div>" +
+
+            "<div class='request-time'>" +
+                "<small>" +
+                    "<strong>Practice time:</strong> " +
+                    formatTimestamp(request.scheduledFor) +
+                "</small>" +
+            "</div>";
+
+    if (ownRequest) {
+        requestCard +=
+            "<div class='request-action'>" +
+                "This is your request." + "<button onclick='cancelRequest(" + request.id + ")'>Cancel</button>" +
+            "</div>";
+    } else {
+        requestCard +=
+            "<div class='request-action'>" +
+                "<button onclick='acceptRequest(" +
+                request.id +
+                ")'>" +
+                    "Accept" +
+                "</button>" +
+            "</div>";
     }
-}
 
+    requestCard += "</div>";
+
+    requestsDiv.innerHTML += requestCard;
+}
+}
 //Creates a new practice request for the given user.
-async function createRequest() {
+async function createRequest(event) {
+    event.preventDefault();
+    practiceDateTimeInput.setCustomValidity("");
+
+    if (!practiceDateTimeInput.reportValidity()) {
+        return;
+    }
+
+    const scheduledFor = new Date(practiceDateTimeInput.value).getTime();
+    if ( Number.isNaN(scheduledFor) ||scheduledFor <= Date.now()) {
+        practiceDateTimeInput.setCustomValidity("Please select a future date and time.");
+
+        practiceDateTimeInput.reportValidity();
+
+        return;
+    }
+
     const response = await fetch(
             "/api/practice/requests",
             {
                 method: "POST",
                 headers: {
+                    "Content-Type":"application/json",
                     "X-User-Id": currentUserId
-                }
+                },
+                body: JSON.stringify({scheduledFor:scheduledFor})
             }
         );
     const data =
@@ -78,6 +289,8 @@ async function createRequest() {
         return;
     }
     //showMessage("Practice request created.");
+    closeRequestMenu();
+    showMessage("");
     loadRequests();
 }
 
@@ -175,6 +388,10 @@ async function loadPairings() {
                     otherUserId +
                 "</div>"+
                 "<small>"+
+                    "<strong Practice time:</strong> "+
+                    formatTimestamp(pairing.scheduledFor)+
+                    "<br>"+
+
                     "Request created: "+
                     formatTimestamp(pairing.timeCreated)+
                     "<br>"+
@@ -231,13 +448,97 @@ function formatTimestamp(timestamp) {
     return date.toLocaleString();
 }
 
+//helper for minimum date ||produced by ChatGPT||
+function formatDateTimeInput(date) {
+    const year = date.getFullYear();
+
+    const month =
+        String(date.getMonth() + 1).padStart(2, "0");
+
+    const day =
+        String(date.getDate()).padStart(2, "0");
+
+    const hours =
+        String(date.getHours()).padStart(2, "0");
+
+    const minutes =
+        String(date.getMinutes()).padStart(2, "0");
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day +
+        "T" +
+        hours +
+        ":" +
+        minutes
+    );
+}
+//open the menu ||produced by ChatGPT||
+function openRequestMenu() {
+    if (!requestMenu || !practiceDateTimeInput) {
+        return;
+    }
+
+    practiceDateTimeInput.value = "";
+
+    practiceDateTimeInput.min =
+        formatDateTimeInput(new Date());
+
+    practiceDateTimeInput.setCustomValidity("");
+
+    requestMenu.hidden = false;
+
+    practiceDateTimeInput.focus();
+}
+//close the menu ||produced by ChatGPT||
+function closeRequestMenu() {
+    if (!requestMenu) {
+        return;
+    }
+
+    requestMenu.hidden = true;
+    if (practiceDateTimeInput) {
+        practiceDateTimeInput.value = "";
+        practiceDateTimeInput.setCustomValidity("");
+    }
+}
+
+
+
+
+
+
 if (categorySelect) {
     categorySelect.addEventListener("change", loadQuestions);
     loadQuestions();
 }
-
+//menu listeners ||produced by ChatGPT||
 if (createRequestButton) {
-    createRequestButton.addEventListener("click", createRequest);
+    createRequestButton.addEventListener("click", openRequestMenu);
+}
+if (requestForm) {
+    requestForm.addEventListener(
+        "submit",
+        createRequest
+    );
+}
+
+if (cancelRequestButton) {
+    cancelRequestButton.addEventListener(
+        "click",
+        closeRequestMenu
+    );
+}
+if (practiceDateTimeInput) {
+    practiceDateTimeInput.addEventListener(
+        "input",
+        function() {
+            practiceDateTimeInput.setCustomValidity("");
+        }
+    );
 }
 if (pairingFilter) {
     pairingFilter.addEventListener("change", loadPairings);
@@ -253,6 +554,12 @@ if (requestsDiv) {
 
 if (pairingsDiv) {
     loadPairingsForCurrentUser();
+}
+if (readinessFilter) {
+    readinessFilter.addEventListener("change", function() {
+        pageNum = 0;
+        loadQuestions();
+    });
 }
 //Builds the demo user buttons and updates role-specific page selections.
 async function loadUsers() {
@@ -324,6 +631,10 @@ function selectUser(userId) {
     }
     if (pairingsDiv) {
         loadPairingsForCurrentUser();
+    }
+    if (questionsDiv) {
+        pageNum = 0;
+        loadQuestions();
     }
 }
 // Converts user-entered text into safe text so it displays as text instead of HTML.
