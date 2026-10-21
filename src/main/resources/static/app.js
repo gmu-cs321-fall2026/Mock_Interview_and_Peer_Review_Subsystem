@@ -18,9 +18,17 @@ let currentUserId = Number(localStorage.getItem("currentUserId"));
 const prevButton = document.getElementById("prevButton");
 const currPage = document.getElementById("currPage");
 const buttonTable = document.getElementById("buttonTable");
-nextButton.addEventListener("click", incrementPage);
-prevButton.addEventListener("click", decrementPage);
-categorySelect.addEventListener("change", resetPageNum); // When switching question categories, reset pageNum
+if (nextButton) {
+    nextButton.addEventListener("click", incrementPage);
+}
+
+if (prevButton) {
+    prevButton.addEventListener("click", decrementPage);
+}
+
+if (categorySelect) {
+    categorySelect.addEventListener("change", resetPageNum);
+}
 var pageSize = 5; // set to 5 for testing purposes
 var pageStart = 0;
 var pageEnd = pageSize-1;
