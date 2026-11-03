@@ -3,26 +3,26 @@
 Requirements for shared core:
   need to be able to store questions in the database
     question has fields for
-      (string)body
-      (string)
-      (boolean)is_approved
+      (string) body
+      (string) text
+      (boolean) is_approved
 
 Notifications fields
-  (int)UUID_usr	SENDER
-  (int)UUID_usr	RECIEVER & INDEX
-  (enum)type
-  (string)inbox_name
-  (string)body
-  (boolean)read_by_recipient
-  (boolean)pinned
-  (timestamptz)sent_at
+  (int) UUID_usr	SENDER
+  (int) UUID_usr	RECIEVER & INDEX
+  (enum) type
+  (string) inbox_name
+  (string) body
+  (boolean) read_by_recipient
+  (boolean) pinned
+  (timestamptz) sent_at
 
 USER_CORE fields
-  (int)UUID_usr
-  (string)hashword
-  (string)email
-  (string[])display_name
-  (enum)notif_preference
-  (enum)usr_status
-  (enum)access_level
+  (int) UUID_usr
+  (string) hashword
+  (string) email
+  (string[]) display_name
+  (enum) notif_preference
+  (enum) usr_status
+  (enum) access_level
 
