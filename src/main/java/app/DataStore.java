@@ -174,7 +174,138 @@ public class DataStore {
     }
     // cancel the request
     requestToCancel.cancel();
+  }// end of cancel request method
+  // cancel pairing
+  public void cancelPairing(int pairingId, int userId) {
+    Pairing pairingToCancel = null;
+
+    for (Pairing pairing : pairings) {
+      if (pairing.getId() == pairingId) {
+        pairingToCancel = pairing;
+        break;
+      }
+    }
+    if (pairingToCancel == null) {
+      throw new IllegalArgumentException("Pairing not found.");
+    }
+    if (pairingToCancel.getRequesterUserId() != userId &&
+            pairingToCancel.getPartnerUserId() != userId) {
+      throw new IllegalArgumentException(
+              "You cannot cancel another student's pairing."
+      );
+    }
+    if (pairingToCancel.isCanceled()) {
+      throw new IllegalStateException(
+              "This pairing has already been canceled."
+      );
+    }
+    pairingToCancel.cancel();// cancel the pairing
+  }//end of cancel pairing
+  public void proposeNewTime(int pairingId, int userId, long newTime) {
+    Pairing pairingToUpdate = null;
+
+    for (Pairing pairing : pairings) {
+      if (pairing.getId() == pairingId) {
+        pairingToUpdate = pairing;
+        break;
+      }
+    }
+    if (pairingToUpdate == null) {
+      throw new IllegalArgumentException("Pairing not found.");
+    }
+    if (pairingToUpdate.getRequesterUserId() != userId &&
+            pairingToUpdate.getPartnerUserId() != userId) {
+      throw new IllegalArgumentException(
+              "You cannot reschedule another student's pairing."
+      );
+    }
+    if (pairingToUpdate.isCanceled()) {
+      throw new IllegalStateException(
+              "Cannot reschedule a canceled pairing."
+      );
+    }
+    if (pairingToUpdate.getProposedScheduledFor() != null) {
+      throw new IllegalStateException(
+              "A rescheduling proposal is already pending."
+      );
+    }
+    pairingToUpdate.proposeNewTime(newTime, userId);
   }
+  public void acceptProposedTime(int pairingId, int userId) {
+    Pairing pairingToUpdate = null;
+
+    for (Pairing pairing : pairings) {
+      if (pairing.getId() == pairingId) {
+        pairingToUpdate = pairing;
+        break;
+      }
+    }
+    if (pairingToUpdate == null) {
+      throw new IllegalArgumentException("Pairing not found.");
+    }
+    if (pairingToUpdate.isCanceled()) {
+      throw new IllegalStateException(
+              "Cannot accept a proposal for a canceled pairing."
+      );
+    }
+    if (pairingToUpdate.getProposedScheduledFor() == null) {
+      throw new IllegalStateException(
+              "No rescheduling proposal is pending."
+      );
+    }
+    if (pairingToUpdate.getProposedByUserId() == userId) {
+      throw new IllegalArgumentException(
+              "You cannot accept your own rescheduling proposal."
+      );
+    }
+    if (pairingToUpdate.getRequesterUserId() != userId &&
+            pairingToUpdate.getPartnerUserId() != userId) {
+      throw new IllegalArgumentException(
+              "You cannot accept another student's rescheduling proposal."
+      );
+    }
+    pairingToUpdate.acceptProposedTime();
+  }//end of accept proposed time
+  public void rejectProposedTime(int pairingId, int userId) {
+    Pairing pairingToUpdate = null;
+
+    for (Pairing pairing : pairings) {
+      if (pairing.getId() == pairingId) {
+        pairingToUpdate = pairing;
+        break;
+      }
+    }
+    if (pairingToUpdate == null) {
+      throw new IllegalArgumentException("Pairing not found.");
+    }
+
+    if (pairingToUpdate.isCanceled()) {
+      throw new IllegalStateException(
+              "Cannot reject a proposal for a canceled pairing."
+      );
+    }
+
+    if (pairingToUpdate.getProposedScheduledFor() == null) {
+      throw new IllegalStateException(
+              "No rescheduling proposal is pending."
+      );
+    }
+
+    if (pairingToUpdate.getRequesterUserId() != userId &&
+            pairingToUpdate.getPartnerUserId() != userId) {
+      throw new IllegalArgumentException(
+              "You cannot reject another student's rescheduling proposal."
+      );
+    }
+
+    if (pairingToUpdate.getProposedByUserId() == userId) {
+      throw new IllegalArgumentException(
+              "You cannot reject your own rescheduling proposal."
+      );
+    }
+    pairingToUpdate.rejectProposedTime();
+  }// end of reject proposed time
+
   // Reject a potential practice partner
   public void rejectPartner(int requestId, int partnerUserId) {
     PracticeRequest requestToReject = null;
@@ -211,7 +342,9 @@ public class DataStore {
     List<Pairing> userPairings = new ArrayList<>();
 
     for (Pairing pairing : pairings) {
-      if (pairing.getRequesterUserId() == userId || pairing.getPartnerUserId() == userId) {
+      if ((pairing.getRequesterUserId() == userId ||
+              pairing.getPartnerUserId() == userId) &&
+              !pairing.isCanceled()) {
         userPairings.add(pairing);
       }
     }
