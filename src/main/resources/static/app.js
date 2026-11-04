@@ -390,20 +390,132 @@ async function loadPairings() {
                 "<small>"+
                     "<strong Practice time:</strong> "+
                     formatTimestamp(pairing.scheduledFor)+
-                    "<br>"+
+                    "<br>"+ (pairing.proposedScheduledFor != null
+                ? "<strong>Proposed time:</strong> " +
+                formatTimestamp(pairing.proposedScheduledFor) +
+                "<br>"
+                : "") +
 
                     "Request created: "+
                     formatTimestamp(pairing.timeCreated)+
                     "<br>"+
                     "Request accepted: "+
                     formatTimestamp(pairing.timeAccepted)+
-                "</small>"+
+                "</small><br>"+
+            (pairing.proposedScheduledFor != null &&
+            pairing.proposedByUserId !== currentUserId
+                ? "<button onclick='acceptProposedTime(" + pairing.id + ")'>Accept</button> " +
+                "<button onclick='rejectProposedTime(" + pairing.id + ")'>Reject</button><br>"
+                : "") +
+            "<button onclick='changeDateTime(" + pairing.id + ")'>Change Date & Time</button>" +
+            "<button onclick='cancelPairing(" + pairing.id + ")'>Cancel Session</button>" +
             "</div>";
 
         pairingsDiv.innerHTML += pairingCard;
     }
 }
+async function cancelPairing(pairingId) {
+    const confirmed = confirm("Are you sure you want to cancel this session?");
 
+    if (!confirmed) {
+        return;
+    }
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/cancel",
+        {
+            method: "POST",
+            headers: {
+                "X-User-Id": currentUserId
+            }
+        }
+    );
+    if (!response.ok) {
+        alert("Unable to cancel the session.");
+        return;
+    }
+    await loadPairings();
+}// end of cancel pairing
+async function changeDateTime(pairingId) {
+    const dateInput = document.createElement("input");
+    dateInput.type = "datetime-local";
+    document.querySelectorAll('input[type="datetime-local"]').forEach(input => {
+        input.remove();
+    });
+    document.querySelector(
+        `button[onclick="changeDateTime(${pairingId})"]`
+    ).insertAdjacentElement("afterend", dateInput);
+    dateInput.showPicker();
+    dateInput.addEventListener("change", async () => {
+        const newDateTime = dateInput.value;
+        console.log("Selected date and time:", newDateTime);
+
+
+        if (newDateTime === null) {
+            return;
+        }
+        const newTime = new Date(newDateTime.replace(" ", "T")).getTime();
+        if (!Number.isFinite(newTime)) {
+            alert("Please enter a valid date and time.");
+            return;
+        }
+        const response = await fetch(
+            "/api/practice/pairings/" + pairingId + "/propose-time?newTime=" + newTime,
+            {
+                method: "POST",
+                headers: {"X-User-Id": currentUserId}
+            }
+        );
+        if (!response.ok) {
+            alert("Unable to propose a new date and time.");
+            return;
+        }
+
+        alert("New date and time proposed successfully.");
+        await loadPairings();
+    });
+}// end of change time
+async function acceptProposedTime(pairingId) {
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/accept-time",
+        {
+            method: "POST",
+            headers: { "X-User-Id": currentUserId }
+        }
+    );
+
+    if (!response.ok) {
+        alert("Unable to accept the proposed time.");
+        return;
+    }
+
+    alert("New appointment time accepted.");
+    await loadPairings();
+}// end of accept proposed time
+async function rejectProposedTime(pairingId) {
+    const confirmed = confirm(
+        "Rejecting this proposal will cancel the entire session. Continue?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/reject-time",
+        {
+            method: "POST",
+            headers: { "X-User-Id": currentUserId }
+        }
+    );
+
+    if (!response.ok) {
+        alert("Unable to reject the proposed time.");
+        return;
+    }
+
+    alert("Proposal rejected. Session canceled.");
+    await loadPairings();
+}// end of reject proposed time
 //Admin view shows all pairings, not just those of the user
 async function loadAdminPairings() {
     const response = await fetch(
@@ -445,7 +557,14 @@ function showMessage(text) {
 //code for formatting timestamp||produced by ChatGPT||
 function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
-    return date.toLocaleString();
+    return date.toLocaleString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+    });
 }
 
 //helper for minimum date ||produced by ChatGPT||

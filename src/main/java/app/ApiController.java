@@ -58,7 +58,35 @@ public class ApiController {
         return Map.of("message", "Practice request canceled.");
     }
 
+    @PostMapping("/pairings/{id}/cancel")
+    public void cancelPairing(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId) {
 
+        store.cancelPairing(id, userId);
+    }
+    @PostMapping("/pairings/{id}/propose-time")
+    public void proposeNewTime(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId,
+            @RequestParam long newTime) {
+
+        store.proposeNewTime(id, userId, newTime);
+    }
+    @PostMapping("/pairings/{id}/accept-time")
+    public void acceptProposedTime(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId) {
+
+        store.acceptProposedTime(id, userId);
+    }
+    @PostMapping("/pairings/{id}/reject-time")
+    public void rejectProposedTime(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId) {
+
+        store.rejectProposedTime(id, userId);
+    }
     @ExceptionHandler({
             IllegalArgumentException.class,
             IllegalStateException.class
