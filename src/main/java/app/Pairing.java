@@ -13,6 +13,8 @@ public class Pairing {
     private boolean canceled = false;
     private Long proposedScheduledFor = null;
     private Integer proposedByUserId = null;
+    private boolean interviewResult = false;
+    private boolean completed = false;
 
     public Pairing(int id, int requestId, int requesterUserId, int partnerUserId,long timestampCreated,long timestampAccepted,long scheduledFor) {
         this.id = id;
@@ -70,4 +72,17 @@ public class Pairing {
     public boolean isCanceled() {
         return canceled;
     }
+
+    public boolean isInterviewResult() {
+        return interviewResult;
+    }
+    public boolean isCompleted(){ 
+        return completed; 
+    }
+
+    public void setInterview(boolean result) {
+        interviewResult = true;
+        completed = result;
+    }
+
 }
