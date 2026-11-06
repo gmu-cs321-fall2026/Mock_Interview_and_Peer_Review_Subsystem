@@ -134,6 +134,13 @@ Prompt(ChatGpt)"adding the code as provided successfully creates the menu and al
 Produced: Suggested fixes for app.js and style.css. Rewrote the function in app.js to show both timestamp and scheduled time. added two functions to style.css to show the date and time.
 changed:Did not change anything, fixes suggested worked when implemented.
 
+Prompt(ChatGPT) "I am running a project using the maven framework and want to find how my test coverage is looking overall right now. I believe that JaCoCo is the right way to check it but I am unsure how to add it to my pom.xml file and how to actual run it. Using the attached repo, show me what should be added to the pom in order to allow JaCoCO to check for test coverage."
+Produced: Appropriate code to add to the plugin section of the pom.xml along with the powershell commands to run it. 
+Changed: Nothing changed, just checked the output with other java sources on the internet before running to confirm the addition was valid. 
+
+Prompt(ChatGPT) "Please provide me with a general form for basic JUnit testing. Provide different example cases for different requirements and layout some of the logic behind the formats. Use this as a general instruction on setting up JUnit testing and include links for Java approved sites for me to review on my own to also confirm/reject your format."
+Produced: 6 General Junit tests with the general explanation behind each one's code and their reason for being there. Also provided links to the standard JUnit test site and the Geeksforgeeks introduction to JUnit. 
+Changed: Worked off of the general layout but adapted to the repo's own requirements and format. Confirmed general format with the sites provided. 
 11/5/2026
 Prompt:(Claude) Look at the current exisiting files and write a result confirmation (yes or no) for ApiController.java.
 It needs to make sure that it also shows it interview has been succesfully completed.
