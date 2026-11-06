@@ -1,21 +1,20 @@
 package app;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 //Stores subsystem data and handles simple JSON
 @Component
@@ -198,6 +197,9 @@ public class DataStore {
       throw new IllegalStateException(
               "This pairing has already been canceled."
       );
+    }
+    if (pairingToCancel.isInterviewResult()) {
+      throw new IllegalStateException("Result has already been submitted and cannot be changed.");
     }
     pairingToCancel.cancel();// cancel the pairing
   }//end of cancel pairing
@@ -433,6 +435,32 @@ public class DataStore {
     return request;
   }
 
+  //---------------- confirms interview is done ---------------------------
+  public synchronized Pairing confirmInterview(int pairingId, int userId, boolean passed) {
+        Pairing paired = null;
+    for (Pairing p : pairings) {
+      if (p.getId() == pairingId)
+        { paired = p; break; }
+    }
+    if (paired == null) {
+      throw new IllegalArgumentException("Pairing not found");
+    }
+    if (System.currentTimeMillis() < paired.getScheduledFor()) {
+      throw new IllegalStateException("Completion can only be recorded after interview is completed!");
+    }
+    paired.setInterview(passed);
+    return paired;
+  }
+
+  public synchronized boolean hasCompletedPractice(int userId) {
+    getUser(userId);
+    for (Pairing p : pairings) {
+      if (p.isCompleted() && !p.isCanceled() && (p.getRequesterUserId() == userId || p.getPartnerUserId() == userId)) {
+        return true;
+      }
+    }
+    return false;
+  }
   // ================= JSON file storage =================
 
   private void loadData() {

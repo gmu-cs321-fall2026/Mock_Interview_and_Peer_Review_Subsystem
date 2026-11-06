@@ -246,3 +246,22 @@ input {
     font-weight: 500;
     line-height: 1.4;
 }
+.practice-status {
+    font-weight: bold;
+    margin-top: 4px;
+}
+.interview-confirm {
+    margin-top: 10px;
+    padding: 8px;
+    border: 1px dashed #888;
+}
+.interview-result {
+    margin-top: 10px;
+    font-weight: bold;
+}
+.interview-result.success {
+    color: #1a7f37;
+}
+.interview-result.failed {
+    color: #b42318;
+}

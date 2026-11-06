@@ -133,3 +133,34 @@ Changed: Adjusted code to fit better in and look neater. Very little changes to 
 Prompt(ChatGpt)"adding the code as provided successfully creates the menu and allows for inputting date and time, however the menu does not close after the request is made and the date and time overwrites the created timestamp.  Additionally when other users view the request, the accept button is next to "practice time:" and the practice time is showing next to "created:"."
 Produced: Suggested fixes for app.js and style.css. Rewrote the function in app.js to show both timestamp and scheduled time. added two functions to style.css to show the date and time.
 changed:Did not change anything, fixes suggested worked when implemented.
+
+11/5/2026
+Prompt:(Claude) Look at the current exisiting files and write a result confirmation (yes or no) for ApiController.java.
+It needs to make sure that it also shows it interview has been succesfully completed.
+Produced: // Interviewer answers yes/no
+@PostMapping("/pairings/{id}/confirm")
+public Pairing confirmInterview(
+        @PathVariable int id,
+        @RequestHeader("X-User-Id") int userId,
+        @RequestBody Map<String, Boolean> body) {
+
+    Boolean passed = body.get("passed");
+    if (passed == null) {
+        throw new IllegalArgumentException("A yes or no answer is required.");
+    }
+    return store.confirmInterview(id, userId, passed);
+}
+
+// true if the student has at least one successfully completed interview, otherwise false
+@GetMapping("/practice-completed")
+public boolean isPracticeCompleted(@RequestHeader("X-User-Id") int userId) {
+    return store.hasCompletedPractice(userId);
+}
+
+Changed: Needed to modify variables to match and also needed to edit app.js to match since the wording I gave seemed to adjust other parts of the files too.
+
+Prompt: (Claude) I need you to, in app.js using Paring and datastore, write fuctions to see if interview is canceled and 
+all the reqeuirements to confirm the interview is done. One to showthe result in a Yes or no prompt, one to make sure that
+the yes and no pops up the second interview time is up and any other nessary functions.
+Produced: Deleted some parts of hardcoded buttons and changed to helper fuctions to get stuff done. Variables way off for some and fuction name call for api is not correct and needs to be changed.
+Changed: modified API calls, timer propmts, vairables to match methods correctly and fixed errors that resulted due to deleting some hardcoded sections.
