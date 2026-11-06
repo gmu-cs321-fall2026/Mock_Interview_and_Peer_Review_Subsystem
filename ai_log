@@ -141,3 +141,33 @@ Changed: Nothing changed, just checked the output with other java sources on the
 Prompt(ChatGPT) "Please provide me with a general form for basic JUnit testing. Provide different example cases for different requirements and layout some of the logic behind the formats. Use this as a general instruction on setting up JUnit testing and include links for Java approved sites for me to review on my own to also confirm/reject your format."
 Produced: 6 General Junit tests with the general explanation behind each one's code and their reason for being there. Also provided links to the standard JUnit test site and the Geeksforgeeks introduction to JUnit. 
 Changed: Worked off of the general layout but adapted to the repo's own requirements and format. Confirmed general format with the sites provided. 
+11/5/2026
+Prompt:(Claude) Look at the current exisiting files and write a result confirmation (yes or no) for ApiController.java.
+It needs to make sure that it also shows it interview has been succesfully completed.
+Produced: // Interviewer answers yes/no
+@PostMapping("/pairings/{id}/confirm")
+public Pairing confirmInterview(
+        @PathVariable int id,
+        @RequestHeader("X-User-Id") int userId,
+        @RequestBody Map<String, Boolean> body) {
+
+    Boolean passed = body.get("passed");
+    if (passed == null) {
+        throw new IllegalArgumentException("A yes or no answer is required.");
+    }
+    return store.confirmInterview(id, userId, passed);
+}
+
+// true if the student has at least one successfully completed interview, otherwise false
+@GetMapping("/practice-completed")
+public boolean isPracticeCompleted(@RequestHeader("X-User-Id") int userId) {
+    return store.hasCompletedPractice(userId);
+}
+
+Changed: Needed to modify variables to match and also needed to edit app.js to match since the wording I gave seemed to adjust other parts of the files too.
+
+Prompt: (Claude) I need you to, in app.js using Paring and datastore, write fuctions to see if interview is canceled and 
+all the reqeuirements to confirm the interview is done. One to showthe result in a Yes or no prompt, one to make sure that
+the yes and no pops up the second interview time is up and any other nessary functions.
+Produced: Deleted some parts of hardcoded buttons and changed to helper fuctions to get stuff done. Variables way off for some and fuction name call for api is not correct and needs to be changed.
+Changed: modified API calls, timer propmts, vairables to match methods correctly and fixed errors that resulted due to deleting some hardcoded sections.

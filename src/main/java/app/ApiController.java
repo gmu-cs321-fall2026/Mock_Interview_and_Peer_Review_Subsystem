@@ -1,9 +1,20 @@
 package app;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 //REST Endpoints for the website
 @RestController
@@ -58,7 +69,35 @@ public class ApiController {
         return Map.of("message", "Practice request canceled.");
     }
 
+    @PostMapping("/pairings/{id}/cancel")
+    public void cancelPairing(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId) {
 
+        store.cancelPairing(id, userId);
+    }
+    @PostMapping("/pairings/{id}/propose-time")
+    public void proposeNewTime(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId,
+            @RequestParam long newTime) {
+
+        store.proposeNewTime(id, userId, newTime);
+    }
+    @PostMapping("/pairings/{id}/accept-time")
+    public void acceptProposedTime(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId) {
+
+        store.acceptProposedTime(id, userId);
+    }
+    @PostMapping("/pairings/{id}/reject-time")
+    public void rejectProposedTime(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId) {
+
+        store.rejectProposedTime(id, userId);
+    }
     @ExceptionHandler({
             IllegalArgumentException.class,
             IllegalStateException.class
@@ -97,6 +136,25 @@ public class ApiController {
     @GetMapping("/users")
     public List<User> getUsers() {
         return store.getUsers();
+    }
+    //--- EDITED BY AI TO CONFIRM PARINGS AND SUCH--
+    @PostMapping("/pairings/{id}/confirm")
+    public Pairing confirmInterview(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId,
+            @RequestBody Map<String, Boolean> body) {
+
+        Boolean passed = body.get("passed");
+        if (passed == null) {
+            throw new IllegalArgumentException("A yes or no answer is required.");
+        }
+        return store.confirmInterview(id, userId, passed);
+    }
+
+    // true if the student has at least one successfully completed interview, otherwise false
+    @GetMapping("/practice-completed")
+    public boolean isPracticeCompleted(@RequestHeader("X-User-Id") int userId) {
+        return store.hasCompletedPractice(userId);
     }
     //--- JASON PERM EDITED BY AI --
     //Admin only: see every requested question

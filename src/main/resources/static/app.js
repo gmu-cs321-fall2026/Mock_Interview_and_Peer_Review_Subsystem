@@ -12,6 +12,8 @@ const requestMenu=document.getElementById("requestMenu");
 const requestForm =document.getElementById("requestForm");
 const practiceDateTimeInput =document.getElementById("practiceDateTime");
 const cancelRequestButton =document.getElementById("cancelRequest");
+const practiceCompletedText = document.getElementById("practiceCompleted");
+let confirmPromptTimer = null; // fires when the next interview becomes ready to confirm
 //Keep the selected demo user when moving between pages.
 let currentUserId = Number(localStorage.getItem("currentUserId"));
  const nextButton = document.getElementById("nextButton");
@@ -366,7 +368,8 @@ async function loadPairings() {
     }
 
     pairingsDiv.innerHTML = "";
-    
+    scheduleConfirmPrompt(pairings);
+
     if (filteredPairings.length === 0) {
         pairingsDiv.innerHTML =
             "<p>No results found.</p>";
@@ -390,20 +393,219 @@ async function loadPairings() {
                 "<small>"+
                     "<strong Practice time:</strong> "+
                     formatTimestamp(pairing.scheduledFor)+
-                    "<br>"+
+                    "<br>"+ (pairing.proposedScheduledFor != null
+                ? "<strong>Proposed time:</strong> " +
+                formatTimestamp(pairing.proposedScheduledFor) +
+                "<br>"
+                : "") +
 
                     "Request created: "+
                     formatTimestamp(pairing.timeCreated)+
                     "<br>"+
                     "Request accepted: "+
                     formatTimestamp(pairing.timeAccepted)+
-                "</small>"+
+                "</small><br>"+
+            (pairing.proposedScheduledFor != null &&
+            pairing.proposedByUserId !== currentUserId
+                ? "<button onclick='acceptProposedTime(" + pairing.id + ")'>Accept</button> " +
+                "<button onclick='rejectProposedTime(" + pairing.id + ")'>Reject</button><br>"
+                : "") +
+            interviewSectionHtml(pairing) +
             "</div>";
 
         pairingsDiv.innerHTML += pairingCard;
     }
 }
+// True when the current user conducted this interview, it has not been answered yet,
+// it is not canceled, and the scheduled date and time has passed.
+function needsInterviewConfirmation(pairing) {
+    return pairing.partnerUserId === currentUserId && 
+        !pairing.canceled &&
+        !pairing.interviewResult &&
+        pairing.scheduledFor <= Date.now();
+}
+// Builds the bottom part of a pairing card: confirmation prompt, result, or the usual buttons.
+function interviewSectionHtml(pairing) {
+    if (pairing.completed) {
+        return "<div class='interview-result success'>Interview completed successfully</div>";
+    }
+    if (pairing.interviewResult) {
+        return "<div class='interview-result failed'>Interview was not completed</div>";
+    }
+    if (needsInterviewConfirmation(pairing)) {
+        return "<div class='interview-confirm'>" +
+                "<strong>Did the interview take place and was it completed successfully?</strong><br>" +
+                "<button onclick='confirmInterview(" + pairing.id + ", true)'>Yes</button> " +
+                "<button onclick='confirmInterview(" + pairing.id + ", false)'>No</button>" +
+            "</div>";
+    }
+    return "<button onclick='changeDateTime(" + pairing.id + ")'>Change Date & Time</button>" +
+        "<button onclick='cancelPairing(" + pairing.id + ")'>Cancel Session</button>";
+}
+// Reloads the pairings at the moment the next interview's time passes so the Yes/No prompt appears.
+function scheduleConfirmPrompt(pairings) {
+    clearTimeout(confirmPromptTimer);
+    const now = Date.now();
+    let nextDue = null;
+    for (let i = 0; i < pairings.length; i++) {
+        const p = pairings[i];
+        if (p.partnerUserId === currentUserId && !p.canceled && !p.interviewResult && p.scheduledFor > now) {
+            if (nextDue === null || p.scheduledFor < nextDue) {
+                nextDue = p.scheduledFor;
+            }
+        }
+    }
+    if (nextDue !== null) {
+        // setTimeout cannot handle delays over ~24 days, so cap it and re-check
+        const delay = Math.min(nextDue - now + 500, 2147483647);
+        confirmPromptTimer = setTimeout(loadPairingsForCurrentUser, delay);
+    }
+}
+// Sends the interviewer's yes/no answer to the API.
+async function confirmInterview(pairingId, passed) {
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/confirm",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-User-Id": currentUserId
+            },
+            body: JSON.stringify({ passed: passed })
+        }
+    );
+    if (!response.ok) {
+        let data = {};
+        try { data = await response.json(); } catch (e) {}
+        alert(data.error || "Unable to confirm the interview.");
+        await loadPairingsForCurrentUser();
+        return;
+    }
+    await loadPairingsForCurrentUser();
+    await loadPracticeCompleted();
+}
+// Updates the "Practice Completed: Yes/No" indicator using the API.
+async function loadPracticeCompleted() {
+    if (!practiceCompletedText) {
+        return;
+    }
+    try {
+        const response = await fetch("/api/practice/practice-completed", {
+            headers: { "X-User-Id": currentUserId }
+        });
+        if (!response.ok) {
+            practiceCompletedText.textContent = "Practice Completed: Unknown";
+            return;
+        }
+        const completed = await response.json();
+        practiceCompletedText.textContent =
+            "Practice Completed: " + (completed === true ? "Yes" : "No");
+    } catch (e) {
+        practiceCompletedText.textContent = "Practice Completed: Unknown";
+    }
+}
+async function cancelPairing(pairingId) {
+    const confirmed = confirm("Are you sure you want to cancel this session?");
 
+    if (!confirmed) {
+        return;
+    }
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/cancel",
+        {
+            method: "POST",
+            headers: {
+                "X-User-Id": currentUserId
+            }
+        }
+    );
+    if (!response.ok) {
+        alert("Unable to cancel the session.");
+        return;
+    }
+    await loadPairings();
+}// end of cancel pairing
+async function changeDateTime(pairingId) {
+    const dateInput = document.createElement("input");
+    dateInput.type = "datetime-local";
+    document.querySelectorAll('input[type="datetime-local"]').forEach(input => {
+        input.remove();
+    });
+    document.querySelector(
+        `button[onclick="changeDateTime(${pairingId})"]`
+    ).insertAdjacentElement("afterend", dateInput);
+    dateInput.showPicker();
+    dateInput.addEventListener("change", async () => {
+        const newDateTime = dateInput.value;
+        console.log("Selected date and time:", newDateTime);
+
+
+        if (newDateTime === null) {
+            return;
+        }
+        const newTime = new Date(newDateTime.replace(" ", "T")).getTime();
+        if (!Number.isFinite(newTime)) {
+            alert("Please enter a valid date and time.");
+            return;
+        }
+        const response = await fetch(
+            "/api/practice/pairings/" + pairingId + "/propose-time?newTime=" + newTime,
+            {
+                method: "POST",
+                headers: {"X-User-Id": currentUserId}
+            }
+        );
+        if (!response.ok) {
+            alert("Unable to propose a new date and time.");
+            return;
+        }
+
+        alert("New date and time proposed successfully.");
+        await loadPairings();
+    });
+}// end of change time
+async function acceptProposedTime(pairingId) {
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/accept-time",
+        {
+            method: "POST",
+            headers: { "X-User-Id": currentUserId }
+        }
+    );
+
+    if (!response.ok) {
+        alert("Unable to accept the proposed time.");
+        return;
+    }
+
+    alert("New appointment time accepted.");
+    await loadPairings();
+}// end of accept proposed time
+async function rejectProposedTime(pairingId) {
+    const confirmed = confirm(
+        "Rejecting this proposal will cancel the entire session. Continue?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/reject-time",
+        {
+            method: "POST",
+            headers: { "X-User-Id": currentUserId }
+        }
+    );
+
+    if (!response.ok) {
+        alert("Unable to reject the proposed time.");
+        return;
+    }
+
+    alert("Proposal rejected. Session canceled.");
+    await loadPairings();
+}// end of reject proposed time
 //Admin view shows all pairings, not just those of the user
 async function loadAdminPairings() {
     const response = await fetch(
@@ -432,6 +634,11 @@ async function loadAdminPairings() {
                     "<br>" +
                     "Request accepted: " +
                     formatTimestamp(pairing.timeAccepted) +
+                    "<br>" +
+                    (pairing.canceled ? "Interview Status: Canceled"
+                        : pairing.completed ? "Interview Status: Interview completed successfully"
+                        : pairing.interviewResult ? "Interview Status: Interview not completed"
+                        : "Interview Status: Not confirmed yet") +
                 "</small>" +
             "</div>";
             
@@ -440,12 +647,22 @@ async function loadAdminPairings() {
 }
 
 function showMessage(text) {
+    if (!message) {
+        return;
+    }
     message.textContent = text;
 }
 //code for formatting timestamp||produced by ChatGPT||
 function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
-    return date.toLocaleString();
+    return date.toLocaleString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+    });
 }
 
 //helper for minimum date ||produced by ChatGPT||
@@ -548,6 +765,8 @@ if (userSwitcher) {
     loadUsers();
 }
 
+loadPracticeCompleted();
+
 if (requestsDiv) {
     loadRequests();
 }
@@ -626,6 +845,7 @@ function selectUser(userId) {
         userId
     );
     loadUsers();
+    loadPracticeCompleted();
     if (requestsDiv) {
         loadRequests();
     }

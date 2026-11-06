@@ -1,1 +1,7 @@
-[ ]
+[ {
+  "id" : 1,
+  "userId" : 102,
+  "question" : "PLZ HELP",
+  "category" : "BEHAVIORAL",
+  "status" : "ACCEPT"
+} ]
