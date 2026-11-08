@@ -3,9 +3,10 @@
 Requirements for shared core:
   need to be able to store questions in the database
     question has fields for
-      (string) body
+      (int) id
       (string) text
-      (boolean) is_approved
+      (string) category
+      
 
 Notifications fields
   (int) UUID_usr	SENDER
