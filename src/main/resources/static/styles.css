@@ -49,6 +49,9 @@ input {
     box-sizing: border-box;
     color:#004d00;
 }
+.request-menu{
+    color:black;
+}
 #message {
     font-weight: bold;
 }
