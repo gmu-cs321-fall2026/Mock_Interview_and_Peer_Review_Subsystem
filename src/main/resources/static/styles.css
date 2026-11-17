@@ -300,3 +300,123 @@ input {
 .home-button:hover {
     background-color: #ffd700;
 }
+
+/* Practice dashboard summary cards */
+.dashboard-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.dashboard-summary .card {
+    margin-top: 0;
+    padding: 20px 10px;
+    text-align: center;
+}
+
+.dashboard-summary strong {
+    display: block;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+    .dashboard-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dashboard only */
+.dashboard-page {
+    background: #faf3df;
+    color: #214b1d;
+    padding: 28px;
+    border-radius: 10px;
+    border: 9px solid #d4a63c;
+}
+
+.dashboard-page h2 {
+    margin-top: 0;
+    margin-bottom: 22px;
+}
+
+/* Three summary cards across */
+#dashboardStats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+#dashboardStats .card {
+    background: white;
+    border: 1px solid #e1e3dc;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 0;
+    text-align: left;
+    font-size: 14px;
+    color: #596b54;
+}
+
+#dashboardStats .card strong {
+    display: block;
+    font-size: 32px;
+    color: #214b1d;
+    margin-bottom: 8px;
+}
+
+/* Separate white sections */
+#readinessStats {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    color: #214b1d;
+}
+
+#sessionHistory {
+    background: white;
+    border-radius: 8px;
+    padding: 18px;
+    min-height: 80px;
+}
+
+#sessionHistory .card {
+    margin-bottom: 10px;
+}
+
+#sessionHistory > p {
+    text-align: center;
+    color: #777;
+    padding: 16px;
+}
+
+@media (max-width: 650px) {
+    #dashboardStats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Softer gold dashboard background */
+.dashboard-page {
+    background: #faf3df;
+}
+
+/* Gold accent on dashboard title */
+.dashboard-page h2 {
+    border-left: 5px solid #d4a63c;
+    padding-left: 14px;
+}
+
+/* Subtle gold trim on statistic cards */
+#dashboardStats .card {
+    border-top: 4px solid #d4a63c;
+}
+
+/* Light gold accents on the lower sections */
+#readinessStats,
+#sessionHistory {
+    border: 1px solid #ead9ab;
+}

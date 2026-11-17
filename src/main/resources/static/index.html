@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mock Interview Practice</title>
+    <title>My Practice Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-<!-- Shared page header and demo user switcher-->
+
+    <!-- Shared page header and demo user switcher-->
 <header>
     <button id="menuButton" class="menu-button" onclick="openNav()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
     <a href="index.html" class="home-button">Home</a>
@@ -17,50 +18,56 @@
         <small id="currentUser"></small>
         <div id="practiceCompleted" class="practice-status">Practice Completed: ...</div>
     </div>
+
+    <div class="user-area">
+        <div id="userSwitcher" class="user-switcher"></div>
+        <small id="currentUser"></small>
+    </div>
+
 </header>
 <!-- Collapsible sidebar navigation (opened with the menu button in the header) -->
 <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeNav()"></div>
 <nav id="mySidebar" class="sidebar" aria-label="Main navigation">
     <button class="closebtn" onclick="closeNav()" aria-label="Close menu">&times;</button>
-    <a href="index.html">Questions</a>
+    <a href="index.html">Practice Dashboard</a>
+    <a href="questions.html">Questions</a>
     <a href="requests.html">Practice Requests</a>
     <a href="requestQuestion.html">Request a Question</a>
 </nav>
 
 
-<!-- Main interview question list and category filter-->
 <main>
-    <section class="questionSection">
-        <h2>Interview Questions</h2>
- 
-        <select id="category">
-            <option value="">All</option> 
-            <option value="BEHAVIORAL">Behavioral</option>
-            <option value="TECHNICAL">Technical</option>
-            <option value="CASE">Case</option>
-            <option value="INDUSTRY">Industry</option>
-        </select>
-        <select id="readinessFilter">
-            <option value="">All Readiness Levels</option>
-            <option value="DONE">Done</option>
-            <option value="REVIEW">Needs Review</option>
-            <option value="NOT_REVIEWED">Not Reviewed</option>
-        </select>
-        <a href="requestQuestion.html">Request Question to Add</a>
-        <center>
-            <div id="questions"></div>
-            <table id="buttonTable">
-                <tr>
-                    <button type="button" id="prevButton" disabled="disabled"></button>
-                    <label id="currPage"></label>
-                    <button type="button" id="nextButton" disabled="disabled"></button>
-                </tr>
-            </table>
-        </center>
+    <section class="contentSection dashboard-page">
+        <h2>My Practice Dashboard</h2>
+
+        <div id="dashboardStats" class="dashboard-summary"></div>
+
+        <h3>Question Readiness</h3>
+        <div id="readinessStats"></div>
+
+        <div class="row">
+            <h3>Interview History</h3>
+
+            <select id="sessionFilter">
+                <option value="all">All Sessions</option>
+                <option value="Upcoming">Upcoming</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="Awaiting Confirmation">
+                    Awaiting Confirmation
+                </option>
+                <option value="Not Completed">Not Completed</option>
+            </select>
+        </div>
+
+        <div id="sessionHistory"></div>
     </section>
 </main>
 
+<p id="message"></p>
+
 <script src="app.js"></script>
+<script src="dashboard.js"></script>
 
 </body>
 </html>

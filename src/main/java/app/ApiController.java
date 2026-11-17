@@ -218,4 +218,11 @@ public class ApiController {
 
         return Map.of("status", status);
     }
+
+    @GetMapping("/dashboard/pairings")
+    public List<Pairing> getDashboardPairings(
+            @RequestHeader("X-User-Id") int userId
+    ) {
+        return store.getPairingHistoryForUser(userId);
+    }
 }
