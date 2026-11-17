@@ -286,3 +286,17 @@ input {
 .interview-result.failed {
     color: #b42318;
 }
+/* Sprint 5 - Home Button */
+.home-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: goldenrod;
+    color: #004d00;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.home-button:hover {
+    background-color: #ffd700;
+}
