@@ -416,13 +416,25 @@ async function loadPairings() {
         pairingsDiv.innerHTML += pairingCard;
     }
 }
-// True when the current user conducted this interview, it has not been answered yet,
-// it is not canceled, and the scheduled date and time has passed.
+
+// The current user's own answer for this pairing (null = not answered yet).
+function myConfirmation(pairing) {
+    return pairing.requesterUserId === currentUserId
+        ? pairing.requesterConfirmation
+        : pairing.partnerConfirmation;
+}
+// True when the current user is in this pairing, has not answered yet, the pairing
+// is not canceled/decided, and the scheduled date and time has passed.
+// Both students get this prompt (each confirms the interview for the other).
 function needsInterviewConfirmation(pairing) {
-    return pairing.partnerUserId === currentUserId && 
+    return (pairing.requesterUserId === currentUserId || pairing.partnerUserId === currentUserId) &&
         !pairing.canceled &&
         !pairing.interviewResult &&
+        (myConfirmation(pairing) === null || myConfirmation(pairing) === undefined) &&
         pairing.scheduledFor <= Date.now();
+}
+function otherUserIdFor(pairing) {
+    return currentUserId === pairing.requesterUserId ? pairing.partnerUserId : pairing.requesterUserId;
 }
 // Builds the bottom part of a pairing card: confirmation prompt, result, or the usual buttons.
 function interviewSectionHtml(pairing) {
@@ -434,10 +446,14 @@ function interviewSectionHtml(pairing) {
     }
     if (needsInterviewConfirmation(pairing)) {
         return "<div class='interview-confirm'>" +
-                "<strong>Did the interview take place and was it completed successfully?</strong><br>" +
-                "<button onclick='confirmInterview(" + pairing.id + ", true)'>Yes</button> " +
-                "<button onclick='confirmInterview(" + pairing.id + ", false)'>No</button>" +
+                "<strong>Was the interview with Student " + otherUserIdFor(pairing) + " completed?</strong><br>" +
+                "<button onclick='confirmInterview(" + pairing.id + ", true)'>Interview Completed</button> " +
+                "<button onclick='confirmInterview(" + pairing.id + ", false)'>Did Not Happen</button>" +
             "</div>";
+    }
+    if (!pairing.canceled && myConfirmation(pairing) === true) {
+        return "<div class='interview-confirm'>You confirmed the interview. Waiting for Student " +
+            otherUserIdFor(pairing) + " to confirm.</div>";
     }
     return "<button onclick='changeDateTime(" + pairing.id + ")'>Change Date & Time</button>" +
         "<button onclick='cancelPairing(" + pairing.id + ")'>Cancel Session</button>";
@@ -449,7 +465,7 @@ function scheduleConfirmPrompt(pairings) {
     let nextDue = null;
     for (let i = 0; i < pairings.length; i++) {
         const p = pairings[i];
-        if (p.partnerUserId === currentUserId && !p.canceled && !p.interviewResult && p.scheduledFor > now) {
+        if ((p.partnerUserId === currentUserId || p.requesterUserId === currentUserId) && !p.canceled && !p.interviewResult && p.scheduledFor > now) {
             if (nextDue === null || p.scheduledFor < nextDue) {
                 nextDue = p.scheduledFor;
             }

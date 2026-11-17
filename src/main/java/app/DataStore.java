@@ -448,7 +448,19 @@ public class DataStore {
     if (System.currentTimeMillis() < paired.getScheduledFor()) {
       throw new IllegalStateException("Completion can only be recorded after interview is completed!");
     }
-    paired.setInterview(passed);
+    if (paired.getRequesterUserId() != userId && paired.getPartnerUserId() != userId) {
+      throw new IllegalArgumentException("You are not part of this pairing.");
+    }
+    if (paired.isCanceled()) {
+      throw new IllegalStateException("This pairing has been canceled.");
+    }
+    if (paired.hasConfirmed(userId)) {
+      throw new IllegalStateException("You have already answered for this interview.");
+    }
+    if (paired.isInterviewResult()) {
+      throw new IllegalStateException("Result has already been submitted and cannot be changed.");
+    }
+    paired.setConfirmation(userId, passed);
     return paired;
   }
 

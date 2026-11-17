@@ -171,3 +171,14 @@ all the reqeuirements to confirm the interview is done. One to showthe result in
 the yes and no pops up the second interview time is up and any other nessary functions.
 Produced: Deleted some parts of hardcoded buttons and changed to helper fuctions to get stuff done. Variables way off for some and fuction name call for api is not correct and needs to be changed.
 Changed: modified API calls, timer propmts, vairables to match methods correctly and fixed errors that resulted due to deleting some hardcoded sections.
+
+11/17/2026
+Prompt: (Claude) Modify and give back results for files Pairing.java, and DataStore.java to check full completion and 
+to make sure interview for both people is done.
+Produced: Gave back good code which did not need much modification(had to delete some confimation checks as they were too much.)
+Changed: Had to modify app.js, index and parts of the teturned code to adjust to the code.
+
+Prompt: (Claude) Look through my current app.js and modify and fix any errors and ajust to match parings. Also comment
+portions of code to explain what it does.
+Produced: Code came back good, though with several pieces of code that just bipassed some issues and never ajusted to fit previous code.
+Changed: Had to delete and reajust portions of my previous code to match the adjusted pairings.
