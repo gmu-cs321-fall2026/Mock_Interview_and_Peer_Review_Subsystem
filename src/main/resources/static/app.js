@@ -13,6 +13,8 @@ const requestForm =document.getElementById("requestForm");
 const practiceDateTimeInput =document.getElementById("practiceDateTime");
 const cancelRequestButton =document.getElementById("cancelRequest");
 const practiceCompletedText = document.getElementById("practiceCompleted");
+const feedbackListDiv = document.getElementById("feedbackList");
+let feedbackWritten = new Set(); // pairing ids this student already wrote feedback for
 let confirmPromptTimer = null; // fires when the next interview becomes ready to confirm
 //Keep the selected demo user when moving between pages.
 let currentUserId = Number(localStorage.getItem("currentUserId"));
@@ -357,6 +359,22 @@ async function loadPairings() {
 
     const pairings = await response.json();
 
+    // Remember which pairings this student has already written feedback for
+    feedbackWritten = new Set();
+    try {
+        const feedbackResponse = await fetch("/api/practice/feedback", {
+            headers: { "X-User-Id": currentUserId }
+        });
+        if (feedbackResponse.ok) {
+            const written = await feedbackResponse.json();
+            for (let i = 0; i < written.length; i++) {
+                if (written[i].authorUserId === currentUserId) {
+                    feedbackWritten.add(written[i].pairingId);
+                }
+            }
+        }
+    } catch (e) {}
+
     let filteredPairings = pairings;
     //Filters the list for requests user has accepted or accepted requests user has made. ||PRODUCED BY CHATGPT||
     if(pairingFilter){
@@ -416,7 +434,6 @@ async function loadPairings() {
         pairingsDiv.innerHTML += pairingCard;
     }
 }
-
 // The current user's own answer for this pairing (null = not answered yet).
 function myConfirmation(pairing) {
     return pairing.requesterUserId === currentUserId
@@ -438,12 +455,31 @@ function otherUserIdFor(pairing) {
 }
 // Builds the bottom part of a pairing card: confirmation prompt, result, or the usual buttons.
 function interviewSectionHtml(pairing) {
+    const answer = myConfirmation(pairing);
+    const answered = answer !== null && answer !== undefined;
+    // 1. Student answered but still owes feedback: shown in the same box as the prompt
+    if (answered && !pairing.canceled && !feedbackWritten.has(pairing.id)) {
+        return "<div class='interview-confirm'>" +
+                "<strong>You answered: " + (answer ? "Interview completed" : "Interview not completed") + "</strong><br>" +
+                "<label for='feedbackText-" + pairing.id + "'>Feedback is required:</label><br>" +
+                "<textarea class='feedback-input' id='feedbackText-" + pairing.id + "' rows='4' " +
+                    "style='width: 100%; box-sizing: border-box; margin: 6px 0;' " +
+                    "placeholder='How did the interview go?' " +
+                    "oninput='saveFeedbackDraft(" + pairing.id + ", this.value)'>" +
+                    escapeHtml(feedbackDrafts[pairing.id] || "") +
+                "</textarea>" +
+                "<div class='interview-result failed' id='feedbackError-" + pairing.id + "'></div>" +
+                "<button onclick='submitFeedback(" + pairing.id + ")'>Submit Feedback</button>" +
+            "</div>";
+    }
+    // 2. Final result
     if (pairing.completed) {
         return "<div class='interview-result success'>Interview completed successfully</div>";
     }
     if (pairing.interviewResult) {
         return "<div class='interview-result failed'>Interview was not completed</div>";
     }
+    // 3. Prompt (both students get it once the scheduled time has passed)
     if (needsInterviewConfirmation(pairing)) {
         return "<div class='interview-confirm'>" +
                 "<strong>Was the interview with Student " + otherUserIdFor(pairing) + " completed?</strong><br>" +
@@ -451,7 +487,8 @@ function interviewSectionHtml(pairing) {
                 "<button onclick='confirmInterview(" + pairing.id + ", false)'>Did Not Happen</button>" +
             "</div>";
     }
-    if (!pairing.canceled && myConfirmation(pairing) === true) {
+    // 4. Answered and feedback sent, waiting on the other student
+    if (!pairing.canceled && answer === true) {
         return "<div class='interview-confirm'>You confirmed the interview. Waiting for Student " +
             otherUserIdFor(pairing) + " to confirm.</div>";
     }
@@ -477,7 +514,7 @@ function scheduleConfirmPrompt(pairings) {
         confirmPromptTimer = setTimeout(loadPairingsForCurrentUser, delay);
     }
 }
-// Sends the interviewer's yes/no answer to the API.
+// Sends the current student's yes/no answer about the interview to the API.
 async function confirmInterview(pairingId, passed) {
     const response = await fetch(
         "/api/practice/pairings/" + pairingId + "/confirm",
@@ -499,6 +536,151 @@ async function confirmInterview(pairingId, passed) {
     }
     await loadPairingsForCurrentUser();
     await loadPracticeCompleted();
+}
+// Feedback is written inside the same box as the interview prompt (see interviewSectionHtml).
+// Drafts are remembered so typed text is not lost if the cards are redrawn.
+const feedbackDrafts = {};
+function saveFeedbackDraft(pairingId, value) {
+    feedbackDrafts[pairingId] = value;
+}
+async function submitFeedback(pairingId) {
+    const box = document.getElementById("feedbackText-" + pairingId);
+    const errorDiv = document.getElementById("feedbackError-" + pairingId);
+    const text = box ? box.value : "";
+    if (text.trim() === "") {
+        if (errorDiv) {
+            errorDiv.textContent = "Please type your feedback before submitting.";
+        }
+        return;
+    }
+    const response = await fetch(
+        "/api/practice/pairings/" + pairingId + "/feedback",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-User-Id": currentUserId
+            },
+            body: JSON.stringify({ text: text })
+        }
+    );
+    if (!response.ok) {
+        let data = {};
+        try { data = await response.json(); } catch (e) {}
+        if (data.error && data.error.indexOf("already submitted") !== -1) {
+            delete feedbackDrafts[pairingId];
+            await loadPairingsForCurrentUser();
+            return;
+        }
+        if (errorDiv) {
+            errorDiv.textContent = data.error || "Unable to submit feedback.";
+        }
+        return;
+    }
+    delete feedbackDrafts[pairingId];
+    showMessage("Feedback submitted. Thank you!");
+    await loadPairingsForCurrentUser();
+    await loadPracticeCompleted();
+}
+// Feedback page: shows feedback the user wrote and received, with a search box.
+let allFeedback = [];
+let userNames = {}; // user id -> username
+async function loadFeedback() {
+    if (!feedbackListDiv) {
+        return;
+    }
+    const usersResponse = await fetch("/api/practice/users");
+    if (usersResponse.ok) {
+        const users = await usersResponse.json();
+        userNames = {};
+        for (let i = 0; i < users.length; i++) {
+            userNames[users[i].id] = users[i].name;
+        }
+    }
+    const response = await fetch("/api/practice/feedback", {
+        headers: { "X-User-Id": currentUserId }
+    });
+    if (!response.ok) {
+        feedbackListDiv.innerHTML = "<p>Unable to load feedback.</p>";
+        return;
+    }
+    allFeedback = await response.json();
+    showFeedback();
+}
+function usernameOf(userId) {
+    return userNames[userId] || ("Student " + userId);
+}
+// True if the search text matches the pairing id, the time stamp, or either student's username.
+function feedbackMatches(f, query) {
+    if (query === "") {
+        return true;
+    }
+    const d = new Date(f.timestamp);
+    const iso = d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0");
+    const fields = [
+        String(f.pairingId),
+        formatTimestamp(f.timestamp),
+        iso,
+        usernameOf(f.authorUserId),
+        usernameOf(f.partnerUserId)
+    ];
+    for (let i = 0; i < fields.length; i++) {
+        if (fields[i].toLowerCase().includes(query)) {
+            return true;
+        }
+    }
+    return false;
+}
+function showFeedback() {
+    const box = document.getElementById("feedbackSearch");
+    const query = box ? box.value.trim().toLowerCase() : "";
+    const directionBox = document.getElementById("feedbackDirection");
+    const direction = directionBox ? directionBox.value : "all";
+    const items = allFeedback.filter(function(f) {
+        if (direction === "mine" && f.authorUserId !== currentUserId) {
+            return false; // only feedback this student wrote
+        }
+        if (direction === "aboutMe" && !(f.partnerUserId === currentUserId && f.authorUserId !== currentUserId)) {
+            return false; // only feedback the other student wrote about this student
+        }
+        return feedbackMatches(f, query);
+    });
+    if (items.length === 0) {
+        feedbackListDiv.innerHTML = (query === "" && direction === "all")
+            ? "<p>No feedback yet.</p>"
+            : "<p>No feedback matches your search.</p>";
+        return;
+    }
+    let html = "";
+    for (let i = 0; i < items.length; i++) {
+        const f = items[i];
+        const mine = f.authorUserId === currentUserId;
+        html +=
+            "<div class='card'>" +
+                "<div><strong>" +
+                    (mine ? "You wrote this about " + escapeHtml(usernameOf(f.partnerUserId))
+                          : escapeHtml(usernameOf(f.authorUserId)) + " wrote this" +
+                            (f.partnerUserId === currentUserId ? " about you"
+                                : " about " + escapeHtml(usernameOf(f.partnerUserId)))) +
+                "</strong></div>" +
+                "<small>Pairing ID: " + f.pairingId +
+                    " | Interview with: " + escapeHtml(usernameOf(mine ? f.partnerUserId : f.authorUserId)) +
+                    " | Interview: " + (f.interviewCompleted ? "Completed" : "Not completed") +
+                    " | " + formatTimestamp(f.timestamp) + "</small>" +
+                "<p>" + escapeHtml(f.text) + "</p>" +
+            "</div>";
+    }
+    feedbackListDiv.innerHTML = html;
+}
+const feedbackSearchBox = document.getElementById("feedbackSearch");
+if (feedbackSearchBox) {
+    feedbackSearchBox.addEventListener("input", showFeedback);
+}
+const feedbackDirectionBox = document.getElementById("feedbackDirection");
+if (feedbackDirectionBox) {
+    feedbackDirectionBox.addEventListener("change", showFeedback);
 }
 // Updates the "Practice Completed: Yes/No" indicator using the API.
 async function loadPracticeCompleted() {
@@ -790,6 +972,18 @@ if (requestsDiv) {
 if (pairingsDiv) {
     loadPairingsForCurrentUser();
 }
+if (feedbackListDiv) {
+    loadFeedback();
+}
+// Auto-refresh every 5 seconds so a student sees their partner's confirmation (and the
+// interview prompt appearing) without reloading the page.
+setInterval(function() {
+    loadPracticeCompleted();
+    if (pairingsDiv && !document.querySelector('input[type="datetime-local"]') &&
+        !document.querySelector('.feedback-input')) {
+        loadPairingsForCurrentUser();
+    }
+}, 5000);
 if (readinessFilter) {
     readinessFilter.addEventListener("change", function() {
         pageNum = 0;
@@ -867,6 +1061,9 @@ function selectUser(userId) {
     }
     if (pairingsDiv) {
         loadPairingsForCurrentUser();
+    }
+    if (feedbackListDiv) {
+        loadFeedback();
     }
     if (questionsDiv) {
         pageNum = 0;

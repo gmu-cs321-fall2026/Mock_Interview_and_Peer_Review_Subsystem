@@ -182,3 +182,13 @@ Prompt: (Claude) Look through my current app.js and modify and fix any errors an
 portions of code to explain what it does.
 Produced: Code came back good, though with several pieces of code that just bipassed some issues and never ajusted to fit previous code.
 Changed: Had to delete and reajust portions of my previous code to match the adjusted pairings.
+
+Prompt: (Claude) Modify feedback.html to add sidebar and fix any syntax errors
+Produced: Gave back needed code. Had to fix a couple of fake syntax errors which were caught
+Changed: Changed the way portions of the feedback appears and syntax errors that were not really errors.
+
+Prompt: (Claude) Read though feedback.html,app.js.apicontroller, and feedback.java to write data storage method in
+Datastore.java for keeping interview feedback. Make sure to match it with feedback.java needed variables.
+Produced: Produced good code that could easily be inserted. Caught a couple of mistakes while testing for bugs
+such as the interview is not storing time and paring id properly.
+Changed: Modified code to recieve the correct time and paring id, also reordred how it appears in feed back when called from data.

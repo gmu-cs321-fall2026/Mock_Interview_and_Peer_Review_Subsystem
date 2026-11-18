@@ -151,6 +151,20 @@ public class ApiController {
         return store.confirmInterview(id, userId, passed);
     }
 
+    @PostMapping("/pairings/{id}/feedback")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Feedback submitFeedback(
+            @PathVariable int id,
+            @RequestHeader("X-User-Id") int userId,
+            @RequestBody Map<String, String> body) {
+        return store.submitFeedback(id, userId, body.get("text"));
+    }
+
+    @GetMapping("/feedback")
+    public List<Feedback> getFeedback(@RequestHeader("X-User-Id") int userId) {
+        return store.getFeedbackForUser(userId);
+    }
+
     // true if the student has at least one successfully completed interview, otherwise false
     @GetMapping("/practice-completed")
     public boolean isPracticeCompleted(@RequestHeader("X-User-Id") int userId) {

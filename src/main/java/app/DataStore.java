@@ -26,6 +26,7 @@ public class DataStore {
   private List<User> users = new ArrayList<>(); // List of all users, be it student or admin
   private List<requestQuestion> requestQuestions = new ArrayList<>(); // List of all requested questions
   private Map<Integer, Map<Integer, String>> questionStatuses = new HashMap<>();
+  private List<Feedback> feedbackList = new ArrayList<>(); // Feedback left after interviews
 
   // ---- Permanent storage (JSON files, created in a "data" folder next to where the server is run) ----
   private static final Path DATA_DIR = Paths.get("data");
@@ -36,6 +37,8 @@ public class DataStore {
   private static final Path QUESTION_STATUSES_FILE =
         DATA_DIR.resolve("question_statuses.json");
 
+  private static final Path FEEDBACK_FILE = DATA_DIR.resolve("feedback.json");
+  private int nextFeedbackId = 1; // ID for the next feedback entry
   private int nextQuestionId = 1; // ID for the next question
   private int nextRequestQuesID = 1; // ID of requested question
   private int nextRequestId = 1; // Id to assign practice request
@@ -473,6 +476,62 @@ public class DataStore {
     }
     return false;
   }
+  //---------------- interview feedback ---------------------------
+
+  public synchronized Feedback submitFeedback(int pairingId, int userId, String text) {
+    getUser(userId);
+    Pairing paired = null;
+    for (Pairing p : pairings) {
+      if (p.getId() == pairingId) { paired = p; break; }
+    }
+    if (paired == null) {
+      throw new IllegalArgumentException("Pairing not found");
+    }
+    if (paired.getRequesterUserId() != userId && paired.getPartnerUserId() != userId) {
+      throw new IllegalArgumentException("You are not part of this pairing.");
+    }
+    if (!paired.hasConfirmed(userId)) {
+      throw new IllegalStateException("Answer whether the interview was completed before leaving feedback.");
+    }
+    if (text == null || text.trim().isEmpty()) {
+      throw new IllegalArgumentException("Feedback cannot be empty.");
+    }
+    for (Feedback f : feedbackList) {
+      if (f.getPairingId() == pairingId && f.getAuthorUserId() == userId) {
+        throw new IllegalStateException("You have already submitted feedback for this interview.");
+      }
+    }
+    int partnerId = paired.getRequesterUserId() == userId ? paired.getPartnerUserId() : paired.getRequesterUserId();
+    boolean answer = paired.getRequesterUserId() == userId
+        ? Boolean.TRUE.equals(paired.getRequesterConfirmation())
+        : Boolean.TRUE.equals(paired.getPartnerConfirmation());
+    Feedback feedback = new Feedback(nextFeedbackId++, pairingId, userId, partnerId, answer,
+        text.trim(), System.currentTimeMillis());
+    feedbackList.add(feedback);
+    saveFeedback();
+    return feedback;
+  }
+
+  // Feedback the user wrote or received (admins see everything), newest first.
+  public synchronized List<Feedback> getFeedbackForUser(int userId) {
+    User user = getUser(userId);
+    List<Feedback> result = new ArrayList<>();
+    for (Feedback f : feedbackList) {
+      if (user.isAdmin() || f.getAuthorUserId() == userId || f.getPartnerUserId() == userId) {
+        result.add(f);
+      }
+    }
+    java.util.Collections.reverse(result);
+    return result;
+  }
+
+  private void saveFeedback() {
+    try {
+      mapper.writerWithDefaultPrettyPrinter().writeValue(FEEDBACK_FILE.toFile(), feedbackList);
+    } catch (IOException e) {
+      throw new IllegalStateException("Could not save feedback.json", e);
+    }
+  }
   // ================= JSON file storage =================
 
   private void loadData() {
@@ -489,6 +548,9 @@ public class DataStore {
       if (Files.exists(QUESTION_REQUESTS_FILE)) {
         requestQuestions = mapper.readValue(QUESTION_REQUESTS_FILE.toFile(), new TypeReference<List<requestQuestion>>() {});
       }
+      if (Files.exists(FEEDBACK_FILE)) {
+        feedbackList = mapper.readValue(FEEDBACK_FILE.toFile(), new TypeReference<List<Feedback>>() {});
+      }
       if (Files.exists(QUESTION_STATUSES_FILE)) {
         questionStatuses = mapper.readValue(
             QUESTION_STATUSES_FILE.toFile(),
@@ -502,6 +564,9 @@ public class DataStore {
     // Continue the ID counters after the highest saved ID
     for (Question q : questions) {
       nextQuestionId = Math.max(nextQuestionId, q.getId() + 1);
+    }
+    for (Feedback f : feedbackList) {
+      nextFeedbackId = Math.max(nextFeedbackId, f.getId() + 1);
     }
     for (requestQuestion r : requestQuestions) {
       nextRequestQuesID = Math.max(nextRequestQuesID, r.getId() + 1);
