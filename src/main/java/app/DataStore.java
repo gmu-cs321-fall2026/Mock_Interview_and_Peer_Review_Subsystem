@@ -474,6 +474,26 @@ public class DataStore {
         return true;
       }
     }
+    return hasCompletedInterviewInFeedback(userId);
+  }
+  private boolean hasCompletedInterviewInFeedback(int userId) {
+    for (Feedback f : feedbackList) {
+      if (!f.isInterviewCompleted()) {
+        continue;
+      }
+      if (f.getAuthorUserId() != userId && f.getPartnerUserId() != userId) {
+        continue;
+      }
+      // look for the other student's matching "completed" answer for the same pairing
+      for (Feedback other : feedbackList) {
+        if (other.getPairingId() == f.getPairingId()
+            && other.getAuthorUserId() == f.getPartnerUserId()
+            && other.getPartnerUserId() == f.getAuthorUserId()
+            && other.isInterviewCompleted()) {
+          return true;
+        }
+      }
+    }
     return false;
   }
   //---------------- interview feedback ---------------------------
@@ -567,6 +587,7 @@ public class DataStore {
     }
     for (Feedback f : feedbackList) {
       nextFeedbackId = Math.max(nextFeedbackId, f.getId() + 1);
+      nextPairingId = Math.max(nextPairingId, f.getPairingId() + 1);
     }
     for (requestQuestion r : requestQuestions) {
       nextRequestQuesID = Math.max(nextRequestQuesID, r.getId() + 1);

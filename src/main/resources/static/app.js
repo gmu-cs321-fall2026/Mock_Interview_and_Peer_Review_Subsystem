@@ -460,11 +460,11 @@ function interviewSectionHtml(pairing) {
     // 1. Student answered but still owes feedback: shown in the same box as the prompt
     if (answered && !pairing.canceled && !feedbackWritten.has(pairing.id)) {
         return "<div class='interview-confirm'>" +
-                "<strong>You answered: " + (answer ? "Interview completed" : "Interview not completed") + "</strong><br>" +
+                "<strong>You answered: " + (answer ? "Yes" : "No") + "</strong><br>" +
                 "<label for='feedbackText-" + pairing.id + "'>Feedback is required:</label><br>" +
                 "<textarea class='feedback-input' id='feedbackText-" + pairing.id + "' rows='4' " +
                     "style='width: 100%; box-sizing: border-box; margin: 6px 0;' " +
-                    "placeholder='How did the interview go?' " +
+                    "placeholder='How did the your partner do in the interview?' " +
                     "oninput='saveFeedbackDraft(" + pairing.id + ", this.value)'>" +
                     escapeHtml(feedbackDrafts[pairing.id] || "") +
                 "</textarea>" +
@@ -483,13 +483,13 @@ function interviewSectionHtml(pairing) {
     if (needsInterviewConfirmation(pairing)) {
         return "<div class='interview-confirm'>" +
                 "<strong>Was the interview with Student " + otherUserIdFor(pairing) + " completed?</strong><br>" +
-                "<button onclick='confirmInterview(" + pairing.id + ", true)'>Interview Completed</button> " +
-                "<button onclick='confirmInterview(" + pairing.id + ", false)'>Did Not Happen</button>" +
+                "<button onclick='confirmInterview(" + pairing.id + ", true)'>Yes</button> " +
+                "<button onclick='confirmInterview(" + pairing.id + ", false)'>No</button>" +
             "</div>";
     }
     // 4. Answered and feedback sent, waiting on the other student
     if (!pairing.canceled && answer === true) {
-        return "<div class='interview-confirm'>You confirmed the interview. Waiting for Student " +
+        return "<div class='interview-confirm'>You confirmed the interview. Waiting forF Student " +
             otherUserIdFor(pairing) + " to confirm.</div>";
     }
     return "<button onclick='changeDateTime(" + pairing.id + ")'>Change Date & Time</button>" +
