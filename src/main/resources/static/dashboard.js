@@ -187,6 +187,21 @@ function loadSessionHistory() {
             "<p>No matching practice sessions.</p>";
     }
 }
+//produced by chatGPT
+function getStarRating(rating){
+    if(rating<1||rating>5){
+        return "Not rated";
+    }
+    let stars ="";
+    for (let i =1;i<=5;i++){
+        if(i<=rating){
+            stars+="★";
+        }else{
+            stars+="☆"
+        }
+    }
+    return stars;
+}
 
 function renderRecentFeedback() {
     recentFeedbackDiv.innerHTML = "";
@@ -218,6 +233,7 @@ function renderRecentFeedback() {
         recentFeedbackDiv.innerHTML +=
             "<div class='card'>" +
                 "<strong>From Student " + feedback.authorUserId + "</strong>" +
+                "<div class='feedback-stars'>"+getStarRating(feedback.rating)+"</div>"+
                 "<small>Interview #" + feedback.pairingId +
                     " | " + formatTimestamp(feedback.timestamp) + "</small>" +
                 "<p>" + escapeHtml(preview) + "</p>" +
