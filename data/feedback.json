@@ -1,0 +1,25 @@
+[ {
+  "id" : 1,
+  "pairingId" : 1,
+  "authorUserId" : 102,
+  "partnerUserId" : 101,
+  "interviewCompleted" : true,
+  "text" : "Pretty good",
+  "timestamp" : 1794963852383
+}, {
+  "id" : 2,
+  "pairingId" : 2,
+  "authorUserId" : 102,
+  "partnerUserId" : 103,
+  "interviewCompleted" : false,
+  "text" : "Terrabile",
+  "timestamp" : 1794963861565
+}, {
+  "id" : 3,
+  "pairingId" : 1,
+  "authorUserId" : 101,
+  "partnerUserId" : 102,
+  "interviewCompleted" : true,
+  "text" : "Pretty good",
+  "timestamp" : 1794963874740
+} ]

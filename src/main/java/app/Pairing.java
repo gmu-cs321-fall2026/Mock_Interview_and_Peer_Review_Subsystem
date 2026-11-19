@@ -1,6 +1,5 @@
 package app;
 
-//Represents two users paired through an accepted pratice request
 public class Pairing {
 
     private int id;
@@ -15,6 +14,8 @@ public class Pairing {
     private Integer proposedByUserId = null;
     private boolean interviewResult = false;
     private boolean completed = false;
+    private Boolean requesterConfirmation = null;
+    private Boolean partnerConfirmation = null;
 
     public Pairing(int id, int requestId, int requesterUserId, int partnerUserId,long timestampCreated,long timestampAccepted,long scheduledFor) {
         this.id = id;
@@ -80,9 +81,33 @@ public class Pairing {
         return completed; 
     }
 
-    public void setInterview(boolean result) {
-        interviewResult = true;
-        completed = result;
+    public Boolean getRequesterConfirmation() {
+        return requesterConfirmation;
+    }
+    public Boolean getPartnerConfirmation() {
+        return partnerConfirmation;
+    }
+
+    public void setConfirmation(int userId, boolean result) {
+        if (userId == requesterUserId) {
+            requesterConfirmation = result;
+        } else if (userId == partnerUserId) {
+            partnerConfirmation = result;
+        } else {
+            throw new IllegalArgumentException("You are not part of this pairing.");
+        }
+        if (Boolean.FALSE.equals(requesterConfirmation) || Boolean.FALSE.equals(partnerConfirmation)) {
+            interviewResult = true;
+            completed = false;
+        } else if (requesterConfirmation != null && partnerConfirmation != null) {
+            interviewResult = true;
+            completed = true;
+        }
+    }
+    public boolean hasConfirmed(int userId) {
+        if (userId == requesterUserId) return requesterConfirmation != null;
+        if (userId == partnerUserId) return partnerConfirmation != null;
+        return false;
     }
 
 }

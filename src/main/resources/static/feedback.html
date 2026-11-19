@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interview Feedback</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<header>
+    <button id="menuButton" class="menu-button" onclick="openNav()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+    <a href="index.html" class="home-button">Home</a>
+    <h1>Mock Interview Practice</h1>
+
+    <div class="user-area">
+        <div id="userSwitcher" class="user-switcher"></div>
+        <small id="currentUser"></small>
+        <div id="practiceCompleted" class="practice-status">Practice Completed: ...</div>
+    </div>
+
+</header>
+
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="closeNav()"></div>
+<nav id="mySidebar" class="sidebar" aria-label="Main navigation">
+    <button class="closebtn" onclick="closeNav()" aria-label="Close menu">&times;</button>
+    <a href="index.html">Questions</a>
+    <a href="requests.html">Practice Requests</a>
+    <a href="requestQuestion.html">Request a Question</a>
+    <a href="feedback.html">Feedback</a>
+</nav>
+
+<main>
+    <section class="contentSection">
+        <h2>Interview Feedback</h2>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <select id="feedbackDirection">
+                <option value="all">ALL</option>
+                <option value="mine">What I wrote</option>
+                <option value="aboutMe">My Feedback</option>
+            </select>
+            <input type="text" id="feedbackSearch" placeholder="Search by pairing ID, date, or student username" style="flex: 1; box-sizing: border-box;">
+        </div>
+        <div id="feedbackList"></div>
+    </section>
+</main>
+
+<p id="message"></p>
+
+<script src="app.js?v=3"></script>
+</body>
+</html>
