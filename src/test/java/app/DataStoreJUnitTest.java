@@ -186,6 +186,6 @@ public class DataStoreJUnitTest {
         }
 
         int bankSize = store.getQuestions("CASE").size() + store.getQuestions("INDUSTRY").size() + store.getQuestions("TECHNICAL").size() + store.getQuestions("BEHAVIORAL").size();
-        assertEquals(25, bankSize);
+        assertEquals(26, bankSize);
     }
 }
