@@ -195,8 +195,7 @@ public class DataStoreTest {
         catch(IllegalArgumentException exception){
                 System.out.println("PASS: question category must be one of the following: BEHAVIORAL, TECHNICAL, CASE, or INDUSTRY.");
         }
-
-        System.out.println("=== Submitting Questions Test: PASSED ===");
+        System.out.println("=== Submit Question Tests: PASSED ===");
         System.out.println("========================================");
         System.out.println("ALL TESTS PASSED");
         System.out.println("========================================");

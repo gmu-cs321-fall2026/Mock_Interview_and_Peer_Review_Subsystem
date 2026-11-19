@@ -147,4 +147,45 @@ public class DataStoreJUnitTest {
         assertEquals("OPEN", request.getStatus());
         assertEquals(0, store.getAllPairings().size());
     }
+
+    @Test
+    void testSubmitQuestion(){
+        DataStore store = new DataStore();
+        // Test invalid text field
+        try{
+            store.submitQuestion(101, null, "BEHAVIORAL");
+            store.submitQuestion(101, "", "BEHAVIORAL");
+            throw new AssertionError(
+                "FAIL: Accepted question with empty or null text field"
+            );
+        }
+        catch(IllegalArgumentException exception){
+            System.out.println("PASS: question text can't be empty or null.");
+        }
+        // Test invalid category field: null
+        try{
+            store.submitQuestion(101, "test", null);
+            store.submitQuestion(101, "test body", "");
+            throw new AssertionError(
+                "FAIL: Accepted question with empty or null category field"
+            );
+        }
+        catch(IllegalArgumentException exception){
+            System.out.println("PASS: question category can't be empty or null.");
+        }
+
+        // Test invalid category field: not null
+        try{
+            store.submitQuestion(101, "test body", "invalidCategory");
+            throw new AssertionError(
+                "FAIL: Accepted question with invalid category field"
+            );
+        }
+        catch(IllegalArgumentException exception){
+            System.out.println("PASS: question category must be one of the following: BEHAVIORAL, TECHNICAL, CASE, or INDUSTRY.");
+        }
+
+        int bankSize = store.getQuestions("CASE").size() + store.getQuestions("INDUSTRY").size() + store.getQuestions("TECHNICAL").size() + store.getQuestions("BEHAVIORAL").size();
+        assertEquals(26, bankSize);
+    }
 }
