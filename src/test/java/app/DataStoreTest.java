@@ -157,6 +157,56 @@ public class DataStoreTest {
                 "Request should remain OPEN after rejected partner tries to accept");
 
         System.out.println("PASS: Request remains OPEN after rejected partner attempts acceptance.");
+
+        System.out.println("=== Practice Request / Pairing Test: PASSED ===");
+        System.out.println("===================================================");
+        System.out.println("=== Question Request Test ===");
+        // Test invalid text field
+        try{
+                store.submitQuestion(101, null, "BEHAVIORAL");
+                store.submitQuestion(101, "", "BEHAVIORAL");
+                throw new AssertionError(
+                        "FAIL: Accepted question with empty or null text field"
+                );
+        }
+        catch(IllegalArgumentException exception){
+                System.out.println("PASS: question text can't be empty or null.");
+        }
+
+        // Test invalid category field: null
+        try{
+                store.submitQuestion(101, "test", null);
+                store.submitQuestion(101, "test body", "");
+                throw new AssertionError(
+                        "FAIL: Accepted question with empty or null category field"
+                );
+        }
+        catch(IllegalArgumentException exception){
+                System.out.println("PASS: question category can't be empty or null.");
+        }
+
+        // Test invalid category field: not null
+        try{
+                store.submitQuestion(101, "test body", "invalidCategory");
+                throw new AssertionError(
+                        "FAIL: Accepted question with invalid category field"
+                );
+        }
+        catch(IllegalArgumentException exception){
+                System.out.println("PASS: question category must be one of the following: BEHAVIORAL, TECHNICAL, CASE, or INDUSTRY.");
+        }
+
+        // Test invalid question request acceptance: non-admin acceptance
+        // NEED TO SEE IF WE NEED TO ADD CAPABILITY TO (accept/reject)RequestedQuestion METHODS TO ALLOW FOR ADMIN VERIFICATION
+        /*try{
+                store.submitQuestion(101, "test","CASE");
+                int bankSize = store.getQuestions("CASE").size() + store.getQuestions("INDUSTRY").size() + store.getQuestions("TECHNICAL").size() + store.getQuestions("BEHAVIORAL").size();
+                store.acceptRequestedQuestion(bankSize);
+        }
+        catch(IllegalAccessError exception){
+                //
+        }*/
+
         System.out.println("========================================");
         System.out.println("ALL TESTS PASSED");
         System.out.println("========================================");
