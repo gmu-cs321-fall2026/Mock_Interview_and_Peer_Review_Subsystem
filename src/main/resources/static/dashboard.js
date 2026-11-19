@@ -1,9 +1,11 @@
 const dashboardStats = document.getElementById("dashboardStats");
 const readinessStats = document.getElementById("readinessStats");
 const sessionHistory = document.getElementById("sessionHistory");
+const recentFeedbackDiv = document.getElementById("recentFeedback");
 const sessionFilter = document.getElementById("sessionFilter");
 
 let dashboardPairings = [];
+let dashboardFeedback = [];
 
 async function loadDashboard() {
     const headers = {
@@ -32,6 +34,28 @@ async function loadDashboard() {
     const questions = await questionsResponse.json();
     const statuses = await statusesResponse.json();
     dashboardPairings = await pairingsResponse.json();
+
+    // Load feedback received by the current student.
+    dashboardFeedback = [];
+
+    const feedbackResponse = await fetch("/api/practice/feedback", {
+        headers: {
+            "X-User-Id": currentUserId
+        }
+    });
+
+    if (feedbackResponse.ok) {
+        const allFeedback = await feedbackResponse.json();
+
+        for (let i = 0; i < allFeedback.length; i++) {
+            const feedback = allFeedback[i];
+
+            if (feedback.partnerUserId === currentUserId &&
+                feedback.authorUserId !== currentUserId) {
+                dashboardFeedback.push(feedback);
+            }
+        }
+    }
 
     // Count question readiness.
     let done = 0;
@@ -84,6 +108,7 @@ async function loadDashboard() {
         " | Not Reviewed: " + notReviewed;
 
     loadSessionHistory();
+    renderRecentFeedback();
 }
 
 function getSessionStatus(pairing) {
@@ -129,17 +154,74 @@ function loadSessionHistory() {
             partnerId = pairing.partnerUserId;
         }
 
+        // Find feedback for this specific interview.
+        let feedbackHtml = "";
+
+        for (let j = 0; j < dashboardFeedback.length; j++) {
+            const feedback = dashboardFeedback[j];
+
+            if (feedback.pairingId === pairing.id &&
+                feedback.authorUserId === partnerId) {
+
+                feedbackHtml =
+                    "<div class='dashboard-feedback'>" +
+                        "<strong>Feedback from Student " + partnerId + "</strong>" +
+                        "<p>" + escapeHtml(feedback.text) + "</p>" +
+                    "</div>";
+
+                break;
+            }
+        }
+
         sessionHistory.innerHTML +=
             "<div class='card'>" +
                 "<strong>Student " + partnerId + "</strong>" +
                 "<p>" + formatTimestamp(pairing.scheduledFor) + "</p>" +
                 "<small>Status: " + status + "</small>" +
-            "</div>";
+                feedbackHtml +
+                "</div>";
     }
 
     if (matchingCount === 0) {
         sessionHistory.innerHTML =
             "<p>No matching practice sessions.</p>";
+    }
+}
+
+function renderRecentFeedback() {
+    recentFeedbackDiv.innerHTML = "";
+
+    if (dashboardFeedback.length === 0) {
+        recentFeedbackDiv.innerHTML = "<p>No feedback received yet.</p>";
+        return;
+    }
+
+    // Most recent feedback first.
+    const sortedFeedback = dashboardFeedback.slice();
+
+    sortedFeedback.sort(function(a, b) {
+        return b.timestamp - a.timestamp;
+    });
+
+    // Display at most three feedback entries.
+    const limit = Math.min(3, sortedFeedback.length);
+
+    for (let i = 0; i < limit; i++) {
+        const feedback = sortedFeedback[i];
+
+        let preview = feedback.text;
+
+        if (preview.length > 180) {
+            preview = preview.substring(0, 180) + "...";
+        }
+
+        recentFeedbackDiv.innerHTML +=
+            "<div class='card'>" +
+                "<strong>From Student " + feedback.authorUserId + "</strong>" +
+                "<small>Interview #" + feedback.pairingId +
+                    " | " + formatTimestamp(feedback.timestamp) + "</small>" +
+                "<p>" + escapeHtml(preview) + "</p>" +
+            "</div>";
     }
 }
 

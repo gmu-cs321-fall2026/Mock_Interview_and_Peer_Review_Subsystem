@@ -420,3 +420,50 @@ input {
 #sessionHistory {
     border: 1px solid #ead9ab;
 }
+
+/* Feedback displayed within interview history */
+.dashboard-feedback {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #fff8e8;
+    border-left: 3px solid #d4a63c;
+    border-radius: 5px;
+}
+
+.dashboard-feedback p {
+    margin: 6px 0 0;
+    white-space: pre-wrap;
+}
+
+/* Recent feedback section */
+#recentFeedback {
+    background: white;
+    border: 1px solid #ead9ab;
+    border-radius: 8px;
+    padding: 12px 18px;
+}
+
+#recentFeedback .card {
+    padding: 12px;
+    margin: 8px 0;
+}
+
+#recentFeedback small {
+    display: block;
+    color: #667065;
+    margin-top: 4px;
+}
+
+#recentFeedback p {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.dashboard-feedback-link {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.dashboard-feedback-link a {
+    color: #214b1d;
+}
