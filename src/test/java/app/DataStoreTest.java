@@ -195,18 +195,7 @@ public class DataStoreTest {
         catch(IllegalArgumentException exception){
                 System.out.println("PASS: question category must be one of the following: BEHAVIORAL, TECHNICAL, CASE, or INDUSTRY.");
         }
-
-        // Test invalid question request acceptance: non-admin acceptance
-        // NEED TO SEE IF WE NEED TO ADD CAPABILITY TO (accept/reject)RequestedQuestion METHODS TO ALLOW FOR ADMIN VERIFICATION
-        /*try{
-                store.submitQuestion(101, "test","CASE");
-                int bankSize = store.getQuestions("CASE").size() + store.getQuestions("INDUSTRY").size() + store.getQuestions("TECHNICAL").size() + store.getQuestions("BEHAVIORAL").size();
-                store.acceptRequestedQuestion(bankSize);
-        }
-        catch(IllegalAccessError exception){
-                //
-        }*/
-
+        System.out.println("=== Submit Question Tests: PASSED ===");
         System.out.println("========================================");
         System.out.println("ALL TESTS PASSED");
         System.out.println("========================================");
