@@ -1069,6 +1069,9 @@ function selectUser(userId) {
         pageNum = 0;
         loadQuestions();
     }
+    if (document.getElementById("dashboardStats")) {
+        loadDashboard();
+    }
 }
 // Converts user-entered text into safe text so it displays as text instead of HTML.
 function escapeHtml(text) {

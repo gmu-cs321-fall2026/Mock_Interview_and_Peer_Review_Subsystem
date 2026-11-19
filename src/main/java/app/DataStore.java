@@ -669,4 +669,20 @@ public class DataStore {
       saveQuestionStatuses();
       return status;
   }
+
+  public List<Pairing> getPairingHistoryForUser(int userId) {
+    getUser(userId);
+
+    List<Pairing> history = new ArrayList<>();
+
+    for (Pairing pairing : pairings) {
+        if (pairing.getRequesterUserId() == userId ||
+            pairing.getPartnerUserId() == userId) {
+
+            history.add(pairing);
+        }
+    }
+
+    return history;
+  }
 }
