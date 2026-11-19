@@ -498,7 +498,7 @@ public class DataStore {
   }
   //---------------- interview feedback ---------------------------
 
-  public synchronized Feedback submitFeedback(int pairingId, int userId, String text) {
+  public synchronized Feedback submitFeedback(int pairingId, int userId, String text,int rating) {
     getUser(userId);
     Pairing paired = null;
     for (Pairing p : pairings) {
@@ -516,6 +516,9 @@ public class DataStore {
     if (text == null || text.trim().isEmpty()) {
       throw new IllegalArgumentException("Feedback cannot be empty.");
     }
+    if(rating<1||rating>5){
+      throw new IllegalArgumentException("Rating must be between 1 and 5.");
+    }
     for (Feedback f : feedbackList) {
       if (f.getPairingId() == pairingId && f.getAuthorUserId() == userId) {
         throw new IllegalStateException("You have already submitted feedback for this interview.");
@@ -526,7 +529,7 @@ public class DataStore {
         ? Boolean.TRUE.equals(paired.getRequesterConfirmation())
         : Boolean.TRUE.equals(paired.getPartnerConfirmation());
     Feedback feedback = new Feedback(nextFeedbackId++, pairingId, userId, partnerId, answer,
-        text.trim(), System.currentTimeMillis());
+        text.trim(),rating, System.currentTimeMillis());
     feedbackList.add(feedback);
     saveFeedback();
     return feedback;

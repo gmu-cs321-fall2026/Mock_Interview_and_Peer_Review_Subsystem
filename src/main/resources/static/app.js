@@ -464,10 +464,35 @@ function interviewSectionHtml(pairing) {
                 "<label for='feedbackText-" + pairing.id + "'>Feedback is required:</label><br>" +
                 "<textarea class='feedback-input' id='feedbackText-" + pairing.id + "' rows='4' " +
                     "style='width: 100%; box-sizing: border-box; margin: 6px 0;' " +
-                    "placeholder='How did the your partner do in the interview?' " +
+                    "placeholder='How did your partner do in the interview?' " +
                     "oninput='saveFeedbackDraft(" + pairing.id + ", this.value)'>" +
                     escapeHtml(feedbackDrafts[pairing.id] || "") +
                 "</textarea>" +
+                //rating section produced by ChatGPT
+                "<div class='feedback-rating-row'>" +
+
+                    "<label for='feedbackRating-" +
+                        pairing.id +
+                        "'>" +
+                        "Rating:" +
+                    "</label>" +
+
+                    "<select class='feedback-rating' " +
+                        "id='feedbackRating-" +
+                        pairing.id +
+                        "'>" +
+
+                        "<option value=''>Select Rating</option>" +
+                        "<option value='1'>1</option>" +
+                        "<option value='2'>2</option>" +
+                        "<option value='3'>3</option>" +
+                        "<option value='4'>4</option>" +
+                        "<option value='5'>5</option>" +
+
+                        "</select>" +
+
+                 "</div>" +
+                //end section produced by chatGpt
                 "<div class='interview-result failed' id='feedbackError-" + pairing.id + "'></div>" +
                 "<button onclick='submitFeedback(" + pairing.id + ")'>Submit Feedback</button>" +
             "</div>";
@@ -547,12 +572,22 @@ async function submitFeedback(pairingId) {
     const box = document.getElementById("feedbackText-" + pairingId);
     const errorDiv = document.getElementById("feedbackError-" + pairingId);
     const text = box ? box.value : "";
+    const ratingBox=document.getElementById("feedbackRating-"+pairingId);
+    const rating =ratingBox ? Number(ratingBox.value):0;
     if (text.trim() === "") {
         if (errorDiv) {
             errorDiv.textContent = "Please type your feedback before submitting.";
         }
         return;
     }
+    //produced by GPT
+    if(rating <1 || rating>5){
+        if(errorDiv){
+            errorDiv.textContent="Please select a rating from 1 to 5.";
+        }
+        return;
+    }
+    //end produced by GPT
     const response = await fetch(
         "/api/practice/pairings/" + pairingId + "/feedback",
         {
@@ -561,7 +596,7 @@ async function submitFeedback(pairingId) {
                 "Content-Type": "application/json",
                 "X-User-Id": currentUserId
             },
-            body: JSON.stringify({ text: text })
+            body: JSON.stringify({ text: text,rating: rating })
         }
     );
     if (!response.ok) {
@@ -668,6 +703,7 @@ function showFeedback() {
                 "<small>Pairing ID: " + f.pairingId +
                     " | Interview with: " + escapeHtml(usernameOf(mine ? f.partnerUserId : f.authorUserId)) +
                     " | Interview: " + (f.interviewCompleted ? "Completed" : "Not completed") +
+                    " | Rating: " + (f.rating >=1&&f.rating<=5 ? f.rating + "/5":"Not rated")+
                     " | " + formatTimestamp(f.timestamp) + "</small>" +
                 "<p>" + escapeHtml(f.text) + "</p>" +
             "</div>";

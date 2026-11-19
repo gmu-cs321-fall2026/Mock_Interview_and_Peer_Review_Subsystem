@@ -9,6 +9,7 @@ public class Feedback {
     private int partnerUserId;
     private boolean interviewCompleted; 
     private String text;
+    private int rating;
     private long timestamp;
 
     @JsonCreator
@@ -18,6 +19,7 @@ public class Feedback {
                     @JsonProperty("partnerUserId") int partnerUserId,
                     @JsonProperty("interviewCompleted") boolean interviewCompleted,
                     @JsonProperty("text") String text,
+                    @JsonProperty("rating") int rating,
                     @JsonProperty("timestamp") long timestamp) {
         this.id = id;
         this.pairingId = pairingId;
@@ -25,6 +27,7 @@ public class Feedback {
         this.partnerUserId = partnerUserId;
         this.interviewCompleted = interviewCompleted;
         this.text = text;
+        this.rating=rating;
         this.timestamp = timestamp;
     }
     public int getId() {
@@ -49,6 +52,9 @@ public class Feedback {
 
     public String getText() {
         return text;
+    }
+    public int getRating(){
+        return rating;
     }
 
     public long getTimestamp() {

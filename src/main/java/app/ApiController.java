@@ -153,12 +153,25 @@ public class ApiController {
 
     @PostMapping("/pairings/{id}/feedback")
     @ResponseStatus(HttpStatus.CREATED)
+    //code produced by CHATGPT
     public Feedback submitFeedback(
             @PathVariable int id,
             @RequestHeader("X-User-Id") int userId,
-            @RequestBody Map<String, String> body) {
-        return store.submitFeedback(id, userId, body.get("text"));
+            @RequestBody Map<String, Object> body) {
+                String text=body.get("text")==null ? null : body.get("text").toString();
+                Object ratingValue=body.get("rating");
+                if(ratingValue==null){
+                    throw new IllegalArgumentException("rating is required.");
+                }
+                int rating;
+                try{
+                    rating=Integer.parseInt(ratingValue.toString());
+                } catch (NumberFormatException e){
+                    throw new IllegalArgumentException("rating must be between 1-5.");
+                }
+        return store.submitFeedback(id, userId, text,rating);
     }
+    //end code produced by CHATGPT
 
     @GetMapping("/feedback")
     public List<Feedback> getFeedback(@RequestHeader("X-User-Id") int userId) {

@@ -5,6 +5,7 @@
   "partnerUserId" : 101,
   "interviewCompleted" : true,
   "text" : "Pretty good",
+  "rating" : 0,
   "timestamp" : 1794963852383
 }, {
   "id" : 2,
@@ -13,6 +14,7 @@
   "partnerUserId" : 103,
   "interviewCompleted" : false,
   "text" : "Terrabile",
+  "rating" : 0,
   "timestamp" : 1794963861565
 }, {
   "id" : 3,
@@ -21,5 +23,42 @@
   "partnerUserId" : 102,
   "interviewCompleted" : true,
   "text" : "Pretty good",
+  "rating" : 0,
   "timestamp" : 1794963874740
+}, {
+  "id" : 4,
+  "pairingId" : 4,
+  "authorUserId" : 101,
+  "partnerUserId" : 102,
+  "interviewCompleted" : true,
+  "text" : "They did fantastic!!",
+  "rating" : 0,
+  "timestamp" : 1795064360847
+}, {
+  "id" : 5,
+  "pairingId" : 4,
+  "authorUserId" : 102,
+  "partnerUserId" : 101,
+  "interviewCompleted" : true,
+  "text" : "he was alright....",
+  "rating" : 0,
+  "timestamp" : 1795064373751
+}, {
+  "id" : 6,
+  "pairingId" : 5,
+  "authorUserId" : 101,
+  "partnerUserId" : 102,
+  "interviewCompleted" : true,
+  "text" : "he did great",
+  "rating" : 4,
+  "timestamp" : 1795108216350
+}, {
+  "id" : 7,
+  "pairingId" : 5,
+  "authorUserId" : 102,
+  "partnerUserId" : 101,
+  "interviewCompleted" : true,
+  "text" : "he did bad",
+  "rating" : 1,
+  "timestamp" : 1795108227434
 } ]
