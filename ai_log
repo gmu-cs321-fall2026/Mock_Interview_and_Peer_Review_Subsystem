@@ -197,3 +197,11 @@ Changed: Modified code to recieve the correct time and paring id, also reordred 
 Prompt: (ChatGPT) Read through index, dashboard, app, and styles provided. The information for the feedback on the dashboard is new. Provide the proper additions to the styles.css file to keep the feedback section in line with the rest of the page. 
 Produced: Lines of code to add to the bottom of the styles files in order to format the newly added feature. 
 Changed: Nothing was changed but the values were compared to the other featuers in the dashboard to ensure the end product was cohesive. 
+
+Prompt: (Chat GPT) Using the new files uploaded, generate a way for a user to add a rating of 1-5 while giving feedback. Make it a menu in the feedback entry.
+Produced: Produced multiple functions and adjustments to functions across app.js, apicontroller.java,feedback.java, and datastore.java.
+Changed: Changed formatting of the code and the error messages for the try catch sections. Logic was largely unchanged as it worked as intended.
+
+Prompt: (Chat GPT) Generate a method for showing stars that represent the rating number on the feedback dashboard.
+Produced: Produced a function to be added into dashboard.js that adds an amount of stars equal to the rating and fills the rest of the space with empty stars for ratings less than 5. Additionally added some css to make the stars appear in the feedback section of the dashboard
+Changed: Nothing was changed as the code produced was small in scope and worked as intended initially.
